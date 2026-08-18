@@ -1,0 +1,42 @@
+# Secrets -- never commit
+.env
+.env.local
+.dev-secrets.json
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Node
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-error.log*
+
+# Hardhat
+blockchain/artifacts/
+blockchain/cache/
+blockchain/typechain-types/
+
+# Deployment addresses are environment-specific; the local one is regenerated
+# by `npm run deploy:local`.
+blockchain/deployments/
+
+# Encrypted artifacts produced at runtime
+storage/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

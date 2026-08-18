@@ -1,0 +1,28 @@
+# SecureLock backend
+# Python 3.11+ (tested on 3.13)
+
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+sqlalchemy==2.0.36
+pydantic==2.10.4
+pydantic-settings==2.7.0
+email-validator==2.2.0
+python-multipart==0.0.20
+
+# Auth
+PyJWT==2.10.1
+argon2-cffi==23.1.0
+
+# Cryptography: AES-256-GCM + SHA-256. We never hand-roll primitives.
+cryptography==44.0.0
+
+# Blockchain
+web3==7.6.1
+
+# Testing
+pytest==8.3.4
+httpx==0.28.1
+
+# PostgreSQL support is optional -- SQLite is the default so the demo needs no
+# database server. Install this to point DATABASE_URL at PostgreSQL instead:
+#   pip install "psycopg[binary]==3.2.3"
