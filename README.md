@@ -253,11 +253,15 @@ python scripts/e2e_demo.py            # full flow over real HTTP
 **Built and verified:** smart contracts, backend, cryptography, RBAC, synthesis
 engine, audit chain, seed data, startup tooling, three test suites.
 
-**Not yet built:**
+**Frontend:** Next.js 14 + TypeScript + Tailwind, 16 routes, production build
+clean. Landing, login, dashboard, question vault, question detail, create,
+review queue, variations, paper builder, papers, paper detail, time-lock demo,
+audit trail, blockchain explorer, security dashboard.
 
-- Web frontend (Next.js). The API is complete and documented at `/docs`; the UI
-  is the remaining work.
-- `docs/SIH_PITCH.md` and `docs/JUDGE_QA.md`.
+> If port 3000 is already taken on your machine, start it elsewhere:
+> `cd frontend && npx next start -p 3100`.
+
+**Not yet built:** `docs/SIH_PITCH.md` and `docs/JUDGE_QA.md`.
 
 ---
 
