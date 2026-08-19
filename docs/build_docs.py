@@ -30,6 +30,7 @@ from reportlab.platypus import (
     PageBreak,
     PageTemplate,
     Paragraph,
+    Preformatted,
     Spacer,
     Table,
     TableStyle,
@@ -95,6 +96,9 @@ S = {
     "sealbig": ParagraphStyle(
         "sealbig", parent=_base["Normal"], fontName="Times-Bold", fontSize=17,
         leading=21, textColor=REGISTER),
+    "pre": ParagraphStyle(
+        "pre", parent=_base["Normal"], fontName="Courier", fontSize=8.2,
+        leading=11.4, textColor=INK),
     "sealsmall": ParagraphStyle(
         "sealsmall", parent=_base["Normal"], fontName="Courier", fontSize=8.4,
         leading=13, textColor=colors.HexColor("#AFB6A6")),
@@ -198,9 +202,27 @@ def seal_block(lines):
     return t
 
 
+def diagram(lines):
+    """ASCII art. Preformatted, because Paragraph collapses leading spaces
+    and turns an aligned diagram into a paragraph of noise."""
+    t = Table([[Preformatted("\n".join(lines), S["pre"])]],
+              colWidths=[PAGE_W - 2 * MARGIN])
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), LEAF),
+        ("BOX", (0, 0), (-1, -1), 0.4, RULE),
+        ("TOPPADDING", (0, 0), (-1, -1), 11),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 11),
+        ("LEFTPADDING", (0, 0), (-1, -1), 13),
+    ]))
+    t.spaceAfter = 12
+    return t
+
+
 def code(lines):
-    body = "<br/>".join(escape(l) for l in lines)
-    t = Table([[Paragraph(body, S["cellm"])]], colWidths=[PAGE_W - 2 * MARGIN])
+    # Preformatted, not Paragraph: commands must not reflow, and aligned
+    # trailing comments must stay aligned.
+    t = Table([[Preformatted("\n".join(lines), S["pre"])]],
+              colWidths=[PAGE_W - 2 * MARGIN])
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), LEAF),
         ("BOX", (0, 0), (-1, -1), 0.4, RULE),
@@ -917,6 +939,595 @@ def build_manual():
     print("built", (OUT / "SecureLock_User_Manual.pdf").name)
 
 
+
+
+# ================================================================ DOCUMENT 3
+def build_presentation():
+    doc = Doc(OUT / "SecureLock_Presentation_Guide.pdf",
+              "SecureLock - Presentation Guide", "Presentation guide")
+    f = []
+
+    f += [
+        Spacer(1, 26 * mm),
+        Paragraph("SecureLock", S["title"]),
+        Paragraph("Presentation guide &mdash; SIH internal hackathon, round 1",
+                  S["subtitle"]),
+        Spacer(1, 10 * mm),
+        seal_block([
+            ("EVERYTHING YOU NEED TO PRESENT", "sealsmall"),
+            ("We don't just secure the question<br/>paper. We secure the question.", "sealbig"),
+            ("Problem, existing systems, novelty, stack, demo, limitations,<br/>"
+             "and the questions judges actually ask.", "sealsmall"),
+        ]),
+        Spacer(1, 5 * mm),
+        P("This guide is written in plain language so any member of the team "
+          "can present with it, including someone who did not write the code. "
+          "Read sections 1 to 5 if you have ten minutes. Read all of it if you "
+          "are the one answering questions."),
+        NextPageTemplate("body"),
+        PageBreak(),
+    ]
+
+    # ------------------------------------------------------------- 1
+    f += [
+        H("1. The first thirty seconds", 1),
+        P("Open with the problem, not the technology. Judges hear "
+          "&ldquo;blockchain&rdquo; forty times a day; they hear a sharp problem "
+          "statement rarely."),
+        callout(
+            "Say this, roughly",
+            "&ldquo;When an exam paper leaks, everyone pictures the sealed envelope "
+            "being opened early. But most leaks don't happen there. They happen "
+            "weeks earlier, while the questions are still being written and "
+            "emailed between professors &mdash; before a &lsquo;paper&rsquo; even exists to "
+            "guard.<br/><br/>"
+            "SecureLock secures the whole life of a question, from the moment "
+            "somebody types it to the moment the exam begins. And the final "
+            "paper is held shut by a rule on a blockchain that decides the "
+            "opening moment using its own clock &mdash; not our server's, and not "
+            "yours. I can prove that in about thirty seconds.&rdquo;"),
+        P("Then go straight to the clock demonstration. Do not save it for the "
+          "end; it is the thing they will remember, and it is better shown "
+          "early while attention is highest."),
+
+        H("2. The problem statement", 1),
+        P("A question paper is not created as a single document. It is "
+          "assembled over weeks, by many people:"),
+        numbered([
+            "A professor writes a question on a personal laptop.",
+            "She emails it to a colleague for a second opinion.",
+            "He pastes it into a shared document with his own suggestions.",
+            "Somebody prints a draft to read on the way home.",
+            "A coordinator collects thirty questions into one file and "
+            "circulates it for approval.",
+            "Only now does a &ldquo;question paper&rdquo; exist &mdash; and only now do most "
+            "security systems start protecting it.",
+        ]),
+        P("By that point the content has lived on many machines, in several "
+          "inboxes, and in at least one printout nobody can account for. Every "
+          "one of those steps is a leak opportunity, and none of them is "
+          "recorded anywhere that survives a determined insider."),
+        P("There is a second problem underneath the first. Even a perfectly "
+          "guarded paper has to be <i>released</i> at some moment, and "
+          "something has to decide when that moment has arrived. Whatever "
+          "makes that decision becomes the weakest point in the system."),
+        callout(
+            "The problem in one line",
+            "Protect every question from the moment it is written &mdash; and make "
+            "the release decision something no single person can move.",
+            VERDIGRIS),
+        PageBreak(),
+    ]
+
+    # ------------------------------------------------------------- 3
+    f += [
+        H("3. How papers are protected today, and where each protection breaks", 1),
+        P("These are the approaches currently in use across boards and "
+          "universities. Each is sensible. Each has a specific hole, and the "
+          "holes are all the same shape: they depend on trusting whoever holds "
+          "the most privilege."),
+        table([
+            ["What is used today", "How it works", "Where it breaks"],
+            ["<b>Sealed physical packets</b>",
+             "Papers printed at a confidential press, sealed, moved under "
+             "escort, stored in a strongroom, opened at a fixed hour before "
+             "witnesses.",
+             "Protects the printed paper only. The questions existed digitally "
+             "for weeks beforehand, entirely outside this protection."],
+            ["<b>Confidential printing presses</b>",
+             "A small trusted vendor prints under supervision.",
+             "Concentrates trust in one organisation, and again begins after "
+             "the questions are already written."],
+            ["<b>Encrypted file with a password released on exam day</b>",
+             "Centres receive an encrypted paper in advance; the password is "
+             "sent on the morning of the exam.",
+             "The encrypted file is already sitting at every centre. Security "
+             "rests entirely on one password held by a small group &mdash; and on "
+             "them not sending it early."],
+            ["<b>Server-side timed release</b>",
+             "A central server refuses to hand over the paper until a set time.",
+             "The server's clock is set by whoever administers the server. "
+             "An insider with that access can bring the release forward, and "
+             "the logs that would show it are on the same server."],
+            ["<b>ERP exam modules with roles and audit logs</b>",
+             "Role-based access, with a database log of who did what.",
+             "The log is a database table. A database administrator can edit "
+             "it. A record that its own keeper can quietly rewrite is not "
+             "evidence."],
+        ], [40 * mm, 56 * mm, PAGE_W - 2 * MARGIN - 96 * mm]),
+        P("Notice the pattern. Every one of these protects the <i>final "
+          "artefact</i>, and every one leaves at least one person who can "
+          "quietly override it &mdash; usually the person best placed to do so "
+          "without being noticed.", "small"),
+
+        H("4. What we built", 1),
+        P("SecureLock is a working prototype, not a slide deck. It runs "
+          "offline on one laptop and does all of the following, verified by "
+          "automated tests:"),
+        bullets([
+            "Encrypts <b>every question separately</b>, each with its own key, "
+            "at the moment it is written. The readable text is never stored.",
+            "Gives every question a <b>fingerprint</b> (SHA-256) and records "
+            "that fingerprint on a blockchain, along with an anonymous marker "
+            "for who wrote it and when.",
+            "Treats <b>READ, WRITE and APPROVE as three separate "
+            "permissions</b>, checked on the server for every request &mdash; a "
+            "reviewer can approve without ever being able to edit.",
+            "Assembles the paper automatically from the approved pool, "
+            "balancing the blueprint, avoiding near-duplicates and spreading "
+            "authorship, so <b>no setter can predict which of their questions "
+            "was used</b>.",
+            "Seals the finished paper and registers it with a release time in "
+            "a <b>smart contract</b>, which then refuses to permit release "
+            "until the blockchain's own clock passes that time.",
+            "Records every action &mdash; including every refusal &mdash; in a "
+            "<b>hash-chained audit log</b> where editing one row breaks every "
+            "row after it, visibly.",
+        ]),
+        PageBreak(),
+    ]
+
+    # ------------------------------------------------------------- 5, 6
+    f += [
+        H("5. What is genuinely new", 1),
+        P("Be honest here. AES, SHA-256 and smart contracts are ordinary, "
+          "well-known technology. Claiming to have invented them would be "
+          "caught instantly. The contribution is <b>where</b> they are applied "
+          "and <b>what is deliberately left out</b>."),
+        table([
+            ["Novelty", "Why it matters"],
+            ["<b>The question is the unit of security, not the paper</b>",
+             "Everything else on the market starts protecting at the point a "
+             "paper exists. We start at the keystroke. This is the core idea "
+             "and the whole reason the system is shaped the way it is."],
+            ["<b>Per-question keys, not one paper key</b>",
+             "There is never a moment when one secret unlocks everything. "
+             "Compromising one key costs one question."],
+            ["<b>The release condition is not ours to move</b>",
+             "The decision lives in a smart contract and reads "
+             "<font face='Courier'>block.timestamp</font>. Not our server "
+             "clock, not the user's device. No administrator on our side can "
+             "bring an exam paper forward."],
+            ["<b>Refusals are first-class evidence</b>",
+             "Most systems log successes. We record every denial and anchor "
+             "it. An investigation usually needs the attempts that failed, "
+             "not the ones that worked."],
+            ["<b>Blockchain used in exactly two places, and argued for</b>",
+             "Only the provenance anchor and the release condition. Everything "
+             "else is an ordinary database, because for those jobs a database "
+             "is the correct tool. Being able to say where blockchain is "
+             "<i>not</i> used is itself unusual."],
+            ["<b>It fails honestly</b>",
+             "If the chain is unreachable, the system refuses release rather "
+             "than falling back to a server clock, and records the attempt "
+             "instead of inventing a transaction hash that would look "
+             "convincing and mean nothing."],
+        ], [56 * mm, PAGE_W - 2 * MARGIN - 56 * mm]),
+
+        H("6. Technology stack", 1),
+        P("Every choice below is boring on purpose. Nothing here is "
+          "experimental, because an examination system is not the place for "
+          "novelty in the plumbing."),
+        table([
+            ["Layer", "What we used", "Why"],
+            ["<b>Smart contracts</b>",
+             "Solidity 0.8.24, OpenZeppelin AccessControl 5.1, Hardhat 2.22",
+             "Two contracts: QuestionRegistry (provenance) and PaperTimeLock "
+             "(release). OpenZeppelin because writing your own access control "
+             "is how contracts get broken."],
+            ["<b>Blockchain</b>", "Local EVM chain (Hardhat), chain ID 31337",
+             "Runs offline, needs no internet, no faucet and no real currency. "
+             "Any EVM-compatible network works by changing one setting."],
+            ["<b>Backend</b>",
+             "Python 3.11-3.13, FastAPI 0.115, SQLAlchemy 2.0, Pydantic 2.10",
+             "FastAPI gives typed request validation and interactive API docs "
+             "for free, which matters when judges ask to see the real "
+             "endpoint."],
+            ["<b>Cryptography</b>",
+             "AES-256-GCM and SHA-256 via <font face='Courier'>cryptography</font> "
+             "44; Argon2id for passwords; JWT for sessions",
+             "Standard primitives from a maintained library. We never "
+             "hand-roll cryptography. GCM also detects tampering with the "
+             "ciphertext itself."],
+            ["<b>Database</b>", "SQLite by default, PostgreSQL supported",
+             "No database server to install for the demo; one setting switches "
+             "to PostgreSQL for anything real."],
+            ["<b>Chain access</b>", "web3.py 7.6",
+             "Submits transactions and reads events back from the chain."],
+            ["<b>Web app</b>",
+             "Next.js 14, React 18, TypeScript, Tailwind CSS",
+             "Sixteen routes. TypeScript so the API contract is checked at "
+             "build time rather than during a demo."],
+            ["<b>Testing</b>",
+             "37 contract tests, 44 backend tests, a 56-assertion end-to-end run",
+             "The end-to-end run drives the real HTTP API against the real "
+             "chain and asserts every outcome, including the attacks."],
+        ], [28 * mm, 54 * mm, PAGE_W - 2 * MARGIN - 82 * mm]),
+        PageBreak(),
+    ]
+
+    # ------------------------------------------------------------- 7, 8
+    f += [
+        H("7. How the software works", 1),
+        P("Three layers, and one rule that holds the whole design together: "
+          "<b>content stays off the chain, encrypted; only fingerprints go "
+          "on it.</b>"),
+        diagram([
+            "               WEB APP  (Next.js, 16 routes)",
+            "                        |",
+            "               API      (FastAPI)",
+            "                        |   permissions - encryption",
+            "                        |   assembly    - audit chain",
+            "             +----------+----------+",
+            "             |                     |",
+            "        DATABASE               BLOCKCHAIN (EVM)",
+            "        accounts               QuestionRegistry.sol",
+            "        ciphertext             PaperTimeLock.sol",
+            "        wrapped keys           |",
+            "        audit log              fingerprints, provenance,",
+            "                               release condition",
+            "",
+            "   plaintext is never          no question text ever",
+            "   stored, in any layer        reaches the chain",
+        ]),
+        P("The life of a paper, in eight stages:"),
+        table([
+            ["Stage", "What happens"],
+            ["<b>1. Written</b>",
+             "A setter submits a question. It is encrypted with its own "
+             "AES-256-GCM key and fingerprinted before anything is stored."],
+            ["<b>2. Anchored</b>",
+             "The fingerprint, an anonymous author marker and a timestamp are "
+             "written to QuestionRegistry on the chain."],
+            ["<b>3. Guarded</b>",
+             "Any read is checked against READ/WRITE/APPROVE grants on the "
+             "server. Refusals are recorded and anchored."],
+            ["<b>4. Reviewed</b>",
+             "A reviewer approves. The question is frozen against edits, "
+             "including by its author, and the lifecycle change is recorded on "
+             "the chain."],
+            ["<b>5. Assembled</b>",
+             "A seeded optimiser selects questions against the blueprint, "
+             "penalises near-duplicates (TF-IDF similarity) and spreads "
+             "authorship. The same seed reproduces the same paper, so the "
+             "process is auditable."],
+            ["<b>6. Sealed</b>",
+             "The paper is encrypted, fingerprinted, and registered in "
+             "PaperTimeLock with a release time."],
+            ["<b>7. Refused</b>",
+             "Every early request is refused by the contract &mdash; including from "
+             "the authority that sealed it, and including from a device whose "
+             "clock has been changed."],
+            ["<b>8. Released</b>",
+             "Once <font face='Courier'>block.timestamp</font> passes the "
+             "release time, the contract permits release and the paper "
+             "decrypts."],
+        ], [26 * mm, PAGE_W - 2 * MARGIN - 26 * mm]),
+
+        H("8. Who can do what", 1),
+        table([
+            ["Role", "Can", "Cannot"],
+            ["<b>Question Setter</b>", "Write their own questions",
+             "See another setter's question, or any paper"],
+            ["<b>Reviewer</b>", "Read and approve", "Edit anything, ever"],
+            ["<b>Exam Authority</b>", "Assemble, seal, release",
+             "Open a sealed paper early"],
+            ["<b>Auditor</b>", "Verify fingerprints and provenance",
+             "Read any question text"],
+            ["<b>Super Admin</b>", "Manage accounts, inspect the audit trail",
+             "Read question content"],
+        ], [30 * mm, 48 * mm, PAGE_W - 2 * MARGIN - 78 * mm]),
+        P("The last row is worth saying out loud to judges: <b>the most "
+          "privileged account in the system deliberately cannot read what the "
+          "system protects.</b> That is unusual, and it is the direct answer "
+          "to &ldquo;what about a corrupt administrator?&rdquo;"),
+        PageBreak(),
+    ]
+
+    f += _presentation_part_two()
+    doc.build(f)
+    print("built", (OUT / "SecureLock_Presentation_Guide.pdf").name)
+
+
+def _presentation_part_two():
+    """Sections 9 onwards: running it, demonstrating it, defending it."""
+    f = []
+
+    # ------------------------------------------------------------- 9
+    f += [
+        H("9. Running it from a Mac terminal", 1),
+        P("Open Terminal and run three commands. The first two are only needed "
+          "once."),
+        code([
+            "git clone https://github.com/anishc23/sih-qpleak.git",
+            "cd sih-qpleak",
+            "./scripts/start.sh",
+        ]),
+        P("That single script checks your versions, installs everything, "
+          "starts the local blockchain, deploys both contracts, seeds the demo "
+          "data, and starts the API and the web app. First run takes a few "
+          "minutes; later runs take seconds."),
+        callout(
+            "One thing that will bite you on a Mac",
+            "You need <b>Python 3.11, 3.12 or 3.13 &mdash; not 3.14</b>. A required "
+            "library cannot be built on 3.14 and pip fails with a long, "
+            "confusing error. The script checks this first and tells you. "
+            "Fix it with:<br/><br/>"
+            "<font face='Courier'>brew install python@3.13</font>"),
+        P("Then open <font face='Courier'>http://localhost:3000</font>."),
+        P("Useful afterwards:"),
+        code([
+            "backend/.venv/bin/python scripts/e2e_demo.py   # prove the whole flow",
+            "./scripts/reset_demo.sh                        # start the demo over",
+            "./scripts/stop.sh                              # stop everything",
+        ]),
+
+        H("10. Running it from a Windows terminal", 1),
+        P("Open PowerShell and run:"),
+        code([
+            "git clone https://github.com/anishc23/sih-qpleak.git",
+            "cd sih-qpleak",
+            ".\\scripts\\start.ps1",
+        ]),
+        P("If PowerShell refuses to run the script, allow local scripts for "
+          "this session only and run it again:"),
+        code(["Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass"]),
+        P("Then open <font face='Courier'>http://localhost:3000</font>."),
+        P("To prove the flow on Windows:"),
+        code(["backend\\.venv\\Scripts\\python.exe scripts\\e2e_demo.py"]),
+        P("Same Python rule applies: install 3.11-3.13 from python.org, not "
+          "3.14, and tick &ldquo;Add Python to PATH&rdquo; during installation.", "small"),
+        callout(
+            "Before you present, on either platform",
+            "Run <font face='Courier'>reset_demo.sh</font> (or reseed on "
+            "Windows), then run the end-to-end demo <b>first</b>, and only "
+            "then seal a fresh paper for the live demonstration. The "
+            "end-to-end run needs a full question pool. Never reset the "
+            "database without also resetting the chain &mdash; they share "
+            "identifiers, and resetting only one means no paper can be sealed "
+            "again."),
+        PageBreak(),
+    ]
+
+    # ------------------------------------------------------------- 11
+    f += [
+        H("11. The five-minute live demonstration", 1),
+        P("The full eight-beat script is in the user manual. If you only have "
+          "five minutes, do these four."),
+        table([
+            ["Beat", "Do", "Say"],
+            ["<b>1. The seal</b>",
+             "Open the landing page. Do not sign in.",
+             "&ldquo;That panel is reading the blockchain directly from the "
+             "browser, not our server. The block number is climbing while we "
+             "talk. Underneath is this laptop's own clock, struck through, "
+             "because nothing consults it.&rdquo;"],
+            ["<b>2. The attack</b>",
+             "Sign in as the exam authority, open Time Lock, press "
+             "<b>Year 2099</b>, then <b>Attempt decryption</b>.",
+             "&ldquo;I've just told the system it's the year 2099 and it believed "
+             "me. The answer is still no, because the contract never asked "
+             "this computer what time it is. That button calls the real API, "
+             "not a mock.&rdquo;"],
+            ["<b>3. The refusal</b>",
+             "Sign in as a question setter and try to open another setter's "
+             "question.",
+             "&ldquo;This isn't a hidden button. The server checks permission on "
+             "every request, and the refusal has just been written into the "
+             "audit trail as evidence.&rdquo;"],
+            ["<b>4. The tamper</b>",
+             "As admin, open Audit Trail, confirm the chain is intact, then "
+             "break one row deliberately.",
+             "&ldquo;Each entry carries the fingerprint of the one before it. "
+             "Editing a single line breaks every line after it &mdash; so a quiet "
+             "correction is impossible.&rdquo;"],
+        ], [24 * mm, 52 * mm, PAGE_W - 2 * MARGIN - 76 * mm]),
+        P("If a judge asks whether the demo is real, open "
+          "<font face='Courier'>127.0.0.1:8000/docs</font> and call the "
+          "decrypt endpoint directly in front of them. It refuses in exactly "
+          "the same way.", "small"),
+
+        H("12. Advantages over what is used today", 1),
+        table([
+            ["Question", "Current systems", "SecureLock"],
+            ["<b>When does protection start?</b>",
+             "When the paper exists, days before the exam",
+             "At the keystroke, weeks earlier"],
+            ["<b>What is the unit of security?</b>",
+             "The whole paper, one file, one password",
+             "Each question, its own key"],
+            ["<b>Can an administrator read the content?</b>",
+             "Usually yes",
+             "No &mdash; the highest-privileged role cannot read questions"],
+            ["<b>Can the log be edited?</b>",
+             "Yes, by whoever runs the database",
+             "Edits break the hash chain and are detected"],
+            ["<b>Who decides the release moment?</b>",
+             "A server clock, set by an administrator",
+             "A smart contract reading the blockchain's own clock"],
+            ["<b>Does changing a device clock help an attacker?</b>",
+             "Sometimes yes",
+             "No, and the attempt is recorded"],
+            ["<b>Are refused attempts recorded?</b>",
+             "Rarely",
+             "Always, and anchored on chain"],
+            ["<b>Can a setter predict the paper?</b>",
+             "Often, since selection is manual",
+             "No &mdash; seeded automatic assembly across many contributors"],
+            ["<b>What happens if the anchor is unreachable?</b>",
+             "Usually silent fallback",
+             "Release is refused; the failure is recorded, never faked"],
+        ], [46 * mm, 50 * mm, PAGE_W - 2 * MARGIN - 96 * mm]),
+        PageBreak(),
+    ]
+
+    # ------------------------------------------------------------- 13, 14
+    f += [
+        H("13. Limitations, stated plainly", 1),
+        P("Say these before a judge finds them. A team that names its own "
+          "limits is far more credible than one that is caught out."),
+        table([
+            ["Limitation", "Our position"],
+            ["<b>It cannot stop a photograph</b>",
+             "Anyone authorised to read a question can photograph the screen. "
+             "No software prevents this. We reduce exposure and make access "
+             "traceable."],
+            ["<b>A local test chain is not a real trust anchor</b>",
+             "The prototype runs a local chain. It demonstrates the mechanism "
+             "correctly, but production would need a permissioned or "
+             "consortium chain with independent validators."],
+            ["<b>The master key is a single point of trust</b>",
+             "Whoever holds it can decrypt the database. In production it "
+             "belongs in an HSM or cloud KMS; the key-vault interface is three "
+             "functions wide precisely so it can be swapped."],
+            ["<b>Question variation is rule-based, not AI</b>",
+             "It restates the instruction and leaves the substantive clause "
+             "untouched, which is exactly why the expected answer cannot "
+             "drift. We label it as rule-based throughout."],
+            ["<b>Blockchain availability is a hard dependency</b>",
+             "If the node is unreachable, release is refused. That is the "
+             "correct direction to fail, but it is a real operational "
+             "constraint."],
+            ["<b>block.timestamp has tolerance</b>",
+             "Validators have some leeway. The honest claim is narrower: an "
+             "end user cannot move it from their own device."],
+            ["<b>An account is not a person</b>",
+             "We prove an authorised account acted, not which human was at the "
+             "keyboard. Binding accounts to people is an organisational "
+             "control, not a software one."],
+        ], [50 * mm, PAGE_W - 2 * MARGIN - 50 * mm]),
+
+        H("14. What we would build next", 1),
+        bullets([
+            "<b>Move to a permissioned chain</b> with validators run by "
+            "independent bodies &mdash; the board, a university, an audit "
+            "authority &mdash; so no single institution controls the anchor.",
+            "<b>Hardware-backed key storage</b> (HSM or cloud KMS) to remove "
+            "the single-point-of-trust master key.",
+            "<b>Two-person release</b>, requiring two authorised officials to "
+            "co-sign before the contract will permit a release.",
+            "<b>Per-centre sealed distribution</b>, so each examination centre "
+            "receives its own sealed copy with its own release record.",
+            "<b>Watermarking per reader</b>, so a photographed question can be "
+            "traced back to the account that displayed it.",
+        ]),
+        PageBreak(),
+    ]
+
+    # ------------------------------------------------------------- 15, 16
+    f += [
+        H("15. Questions judges are likely to ask", 1),
+        table([
+            ["Question", "Answer"],
+            ["<b>Why blockchain? Isn't this just a database?</b>",
+             "For most of it, yes &mdash; and we use an ordinary database for most "
+             "of it. Blockchain is used in exactly two places where a database "
+             "creates a trust problem: the provenance anchor, because a DBA "
+             "can rewrite database history; and the release condition, because "
+             "a server clock can be changed by whoever runs the server."],
+            ["<b>Are the questions stored on the blockchain?</b>",
+             "No. Never. Only fingerprints, anonymous identifiers, timestamps "
+             "and the release condition. If the entire chain were published, "
+             "nobody would learn a single question from it."],
+            ["<b>What if the administrator is corrupt?</b>",
+             "The Super Admin role cannot read question content at all, cannot "
+             "release a paper early, and cannot edit the audit log without "
+             "breaking the hash chain. That is the specific attacker we "
+             "designed against."],
+            ["<b>What if someone changes the server time?</b>",
+             "It changes nothing. The contract reads the blockchain's clock. "
+             "We can demonstrate the equivalent attack from the client side in "
+             "thirty seconds."],
+            ["<b>Is this actually running, or mocked?</b>",
+             "Running. Every button calls the real API against a real chain. "
+             "We can open the API documentation and call the endpoint "
+             "directly, and show you real transaction hashes and block "
+             "numbers."],
+            ["<b>How do you know it works?</b>",
+             "37 smart-contract tests, 44 backend tests, and a 56-assertion "
+             "end-to-end run that drives the real HTTP API and asserts every "
+             "outcome, including the clock attack and tamper detection."],
+            ["<b>Does it need internet?</b>",
+             "No. It runs entirely offline on one laptop. No API keys, no "
+             "cloud services, no cryptocurrency."],
+            ["<b>What is the cost of running a blockchain?</b>",
+             "Nothing here. A permissioned chain has no transaction fees; the "
+             "cost is running nodes, which the participating institutions "
+             "would already do. We deliberately hardcode no public network."],
+            ["<b>Can it scale to a real board exam?</b>",
+             "The database side scales normally. The chain side writes only "
+             "small fingerprints, a few per question, so throughput is "
+             "modest &mdash; but honest answer: we have tested at prototype scale, "
+             "not at board scale."],
+        ], [46 * mm, PAGE_W - 2 * MARGIN - 46 * mm]),
+        PageBreak(),
+    ]
+
+    f += [
+        H("16. Presenter's cheat sheet", 1),
+        P("One page. Take this to the table."),
+        seal_block([
+            ("THE ONE LINE", "sealsmall"),
+            ("We don't just secure the question paper.<br/>"
+             "We secure the question, from creation<br/>to examination.", "sealbig"),
+        ]),
+        table([
+            ["Prompt", "Answer"],
+            ["<b>The problem</b>",
+             "Papers leak weeks before the paper exists, while questions are "
+             "still being written and emailed."],
+            ["<b>The idea</b>",
+             "Secure the whole life of a question, and move the release "
+             "decision somewhere no administrator can reach."],
+            ["<b>The proof</b>",
+             "Set the clock to 2099, ask for the paper, still refused."],
+            ["<b>Where blockchain is used</b>",
+             "Two places only: provenance anchor, release condition."],
+            ["<b>What is on the chain</b>",
+             "Fingerprints, anonymous markers, timestamps. No question text, "
+             "ever."],
+            ["<b>Roles</b>",
+             "Setter, Reviewer, Exam Authority, Auditor, Super Admin &mdash; and "
+             "the admin cannot read questions."],
+            ["<b>Numbers</b>",
+             "37 contract tests, 44 backend tests, 56 end-to-end assertions, "
+             "16 web routes, 2 smart contracts."],
+            ["<b>Biggest limitation</b>",
+             "Cannot stop a photograph. Say it before they ask."],
+            ["<b>Start it</b>",
+             "Mac: ./scripts/start.sh &nbsp;&nbsp; Windows: .\\scripts\\start.ps1"],
+            ["<b>Demo accounts</b>",
+             "authority@securelock.demo and four others, password "
+             "SecureLock#2026"],
+        ], [40 * mm, PAGE_W - 2 * MARGIN - 40 * mm]),
+        P("Final advice: lead with the problem, show the clock attack early, "
+          "and volunteer your limitations. Judges reward teams who clearly "
+          "understand what their system does <i>not</i> do.", "small"),
+    ]
+    return f
+
+
 if __name__ == "__main__":
     build_explained()
     build_manual()
+    build_presentation()
