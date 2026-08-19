@@ -62,7 +62,7 @@ export default function BlockchainPage() {
       >
         {status && (
           <span
-            className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs ${
+            className={`inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-xs ${
               status.connected
                 ? "border-ok/30 bg-ok/[0.06] text-ok"
                 : "border-danger/30 bg-danger/[0.06] text-danger"
@@ -78,7 +78,7 @@ export default function BlockchainPage() {
         <div className="mb-5">
           <Alert kind="danger" title="Blockchain node unreachable">
             <p>{status.error}</p>
-            <p className="mt-2 text-slate-400">
+            <p className="mt-2 text-ink-3">
               Start it with <code className="font-mono">cd blockchain &amp;&amp; npm run node</code>,
               then deploy with <code className="font-mono">npm run deploy:local</code>.
             </p>
@@ -106,18 +106,18 @@ export default function BlockchainPage() {
                 {Object.entries(status.contracts ?? {}).map(([name, addr]) => (
                   <div
                     key={name}
-                    className="flex items-center justify-between border-b border-white/[0.04] pb-2 last:border-0"
+                    className="flex items-center justify-between border-b border-rule-soft pb-2 last:border-0"
                   >
-                    <span className="text-slate-300">{name}.sol</span>
+                    <span className="text-ink-2">{name}.sol</span>
                     <Hash value={addr} chars={30} />
                   </div>
                 ))}
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-slate-500">Chain time</span>
-                  <span className="text-slate-400">{formatUnix(status.blockchain_time)}</span>
+                  <span className="text-ink-4">Chain time</span>
+                  <span className="text-ink-3">{formatUnix(status.blockchain_time)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Relayer</span>
+                  <span className="text-ink-4">Relayer</span>
                   <Hash value={status.sender} chars={24} />
                 </div>
               </div>
@@ -135,9 +135,9 @@ export default function BlockchainPage() {
           ) : (
             <div className="max-h-[28rem] space-y-1.5 overflow-auto">
               {txs.map((t, i) => (
-                <div key={i} className="rounded-lg border border-white/[0.06] px-3 py-2.5">
+                <div key={i} className="rounded-sm border border-rule-soft px-3 py-2.5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-mono text-[11px] text-slate-300">
+                    <span className="font-mono text-[11px] text-ink-2">
                       {t.contract}.{t.method}
                     </span>
                     <span
@@ -152,7 +152,7 @@ export default function BlockchainPage() {
                       {t.status}
                     </span>
                   </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-3 text-[10px] text-slate-600">
+                  <div className="mt-1 flex flex-wrap items-center gap-3 text-[10px] text-ink-5">
                     <span className="font-mono">{t.resource_id}</span>
                     {t.block_number !== null && <span>block #{t.block_number}</span>}
                     {t.gas_used !== null && <span>{t.gas_used.toLocaleString()} gas</span>}
@@ -183,12 +183,12 @@ export default function BlockchainPage() {
           ) : (
             <div className="max-h-[28rem] space-y-1.5 overflow-auto">
               {events.map((e, i) => (
-                <div key={i} className="rounded-lg border border-white/[0.06] px-3 py-2.5">
+                <div key={i} className="rounded-sm border border-rule-soft px-3 py-2.5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-[11px] font-medium text-accent">{e.event}</span>
-                    <span className="text-[10px] text-slate-600">block #{e.block_number}</span>
+                    <span className="text-[10px] text-ink-5">block #{e.block_number}</span>
                   </div>
-                  <p className="mt-0.5 text-[10px] text-slate-600">{e.contract}</p>
+                  <p className="mt-0.5 text-[10px] text-ink-5">{e.contract}</p>
                   <div className="mt-1">
                     <Hash value={e.tx_hash} chars={28} />
                   </div>
@@ -204,7 +204,7 @@ export default function BlockchainPage() {
           <div className="grid gap-5 text-[13px] md:grid-cols-2">
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-ok">On chain</p>
-              <ul className="space-y-1 text-slate-400">
+              <ul className="space-y-1 text-ink-3">
                 {[
                   "SHA-256 content hashes",
                   "keccak256 of question and paper IDs",
@@ -221,7 +221,7 @@ export default function BlockchainPage() {
               <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-danger">
                 Never on chain
               </p>
-              <ul className="space-y-1 text-slate-400">
+              <ul className="space-y-1 text-ink-3">
                 {[
                   "Question text, plaintext or ciphertext",
                   "Answers",

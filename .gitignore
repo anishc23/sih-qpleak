@@ -37,6 +37,9 @@ blockchain/deployments/
 # Encrypted artifacts produced at runtime
 storage/
 
+# Service output from scripts/start.sh
+.logs/
+
 # Editors / OS
 .vscode/
 .idea/

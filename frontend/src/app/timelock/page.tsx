@@ -162,68 +162,82 @@ function TimeLockDemo() {
         <>
           <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
             {/* ---------------------------------------------------- the lock */}
-            <Panel className={clsx(released ? "border-ok/25" : "border-locked/25")}>
-              <div className="flex flex-col items-center py-6">
-                <div className="relative">
-                  {!released && (
-                    <span className="absolute inset-0 animate-pulse-ring rounded-full bg-locked/25" />
+            <section
+              className={clsx(
+                "rounded-sm p-7",
+                released ? "border border-ok/40 bg-leaf shadow-deboss" : "seal",
+              )}
+            >
+              <div className="flex flex-col py-2">
+                {/* Sealed is rendered as ink you cannot see into. Released is
+                    paper: the state change is a change of value, not a badge. */}
+                <p
+                  className={clsx(
+                    "font-mono text-[10px] uppercase tracking-[0.18em]",
+                    released ? "text-ok" : "text-register/60",
                   )}
-                  <div
-                    className={clsx(
-                      "relative flex h-24 w-24 items-center justify-center rounded-full ring-1",
-                      released
-                        ? "bg-ok/10 ring-ok/30"
-                        : "bg-locked/10 ring-locked/30",
-                    )}
-                  >
-                    {released ? (
-                      <Unlock size={38} className="text-ok" />
-                    ) : (
-                      <Lock size={38} className="text-locked" />
-                    )}
-                  </div>
-                </div>
+                >
+                  {released ? "Seal broken" : "Under seal"}
+                </p>
 
                 <p
                   className={clsx(
-                    "mt-5 text-lg font-semibold tracking-tight",
-                    released ? "text-ok" : "text-locked",
+                    "mt-6 font-display leading-none tabular-nums",
+                    released ? "text-4xl text-ok" : "text-6xl text-register",
                   )}
                 >
-                  {released ? "PAPER UNLOCKED" : "PAPER LOCKED"}
+                  {released ? "OPEN" : countdown(remaining)}
+                </p>
+                <p
+                  className={clsx(
+                    "mt-3 font-mono text-[11px]",
+                    released ? "text-ink-4" : "text-register/70",
+                  )}
+                >
+                  {released
+                    ? "the contract permitted the release"
+                    : "remaining, measured by the chain and by nothing else"}
                 </p>
 
-                {!released && (
-                  <>
-                    <p className="mt-5 font-mono text-4xl font-semibold tabular-nums text-white">
-                      {countdown(remaining)}
-                    </p>
-                    <p className="mt-1.5 text-[11px] uppercase tracking-wider text-slate-600">
-                      remaining, by blockchain time
-                    </p>
-                  </>
-                )}
-
-                <div className="mt-6 w-full space-y-2 border-t border-white/[0.06] pt-5 text-xs">
+                <div
+                  className={clsx(
+                    "mt-7 w-full space-y-2 border-t pt-5 text-xs",
+                    released ? "border-rule" : "border-register/20",
+                  )}
+                >
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Paper</span>
-                    <span className="font-mono text-slate-300">{lock.paper_uid}</span>
+                    <span className={released ? "text-ink-4" : "text-register/50"}>Paper</span>
+                    <span
+                      className={clsx("font-mono", released ? "text-ink-2" : "text-register/90")}
+                    >
+                      {lock.paper_uid}
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <span className={released ? "text-ink-4" : "text-register/50"}>Paper hash</span>
+                    {released ? (
+                      <Hash value={lock.paper_hash} chars={14} />
+                    ) : (
+                      <span className="truncate font-mono text-register/80">
+                        {lock.paper_hash}
+                      </span>
+                    )}
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Paper hash</span>
-                    <Hash value={lock.paper_hash} chars={14} />
+                    <span className={released ? "text-ink-4" : "text-register/50"}>Release at</span>
+                    <span className={released ? "text-ink-2" : "text-register/90"}>
+                      {formatUnix(lock.release_time)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Release at</span>
-                    <span className="text-slate-300">{formatUnix(lock.release_time)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Decided by</span>
-                    <span className="font-mono text-accent">block.timestamp</span>
+                    <span className={released ? "text-ink-4" : "text-register/50"}>Decided by</span>
+                    <span className={clsx("font-mono", released ? "text-lac" : "text-register")}>
+                      block.timestamp
+                    </span>
                   </div>
                 </div>
               </div>
-            </Panel>
+            </section>
 
             {/* ------------------------------------------------- the two clocks */}
             <div className="space-y-5">
@@ -234,14 +248,14 @@ function TimeLockDemo() {
                 <div className="space-y-3">
                   <div
                     className={clsx(
-                      "rounded-lg border px-4 py-3",
+                      "rounded-sm border px-4 py-3",
                       clockIsFaked
                         ? "border-danger/30 bg-danger/[0.06]"
-                        : "border-white/[0.07] bg-base-850/50",
+                        : "border-rule bg-sunk/50",
                     )}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-2 text-xs text-slate-400">
+                      <span className="flex items-center gap-2 text-xs text-ink-3">
                         <Monitor size={13} />
                         Your device clock
                       </span>
@@ -254,17 +268,17 @@ function TimeLockDemo() {
                     <p
                       className={clsx(
                         "mt-1.5 font-mono text-sm",
-                        clockIsFaked ? "text-danger" : "text-slate-300",
+                        clockIsFaked ? "text-danger" : "text-ink-2",
                       )}
                     >
                       {formatUnix(displayedClientClock)}
                     </p>
-                    <p className="mt-1 text-[10px] text-slate-600">
+                    <p className="mt-1 text-[10px] text-ink-5">
                       Not consulted by any decision in this system.
                     </p>
                   </div>
 
-                  <div className="rounded-lg border border-accent/25 bg-accent/[0.05] px-4 py-3">
+                  <div className="rounded-sm border border-accent/25 bg-accent/[0.05] px-4 py-3">
                     <div className="flex items-center justify-between">
                       <span className="flex items-center gap-2 text-xs text-accent">
                         <Cpu size={13} />
@@ -277,7 +291,7 @@ function TimeLockDemo() {
                     <p className="mt-1.5 font-mono text-sm text-accent-soft">
                       {formatUnix(lock.blockchain_time)}
                     </p>
-                    <p className="mt-1 text-[10px] text-slate-500">
+                    <p className="mt-1 text-[10px] text-ink-4">
                       Supplied by the chain. Unreachable from your machine.
                     </p>
                   </div>
@@ -291,17 +305,17 @@ function TimeLockDemo() {
                         key={p.label}
                         onClick={() => setClientOffset(p.offset)}
                         className={clsx(
-                          "rounded-lg border px-2.5 py-1.5 text-xs transition",
+                          "rounded-sm border px-2.5 py-1.5 text-xs transition",
                           clientOffset === p.offset
                             ? "border-accent/40 bg-accent/10 text-accent"
-                            : "border-white/10 text-slate-400 hover:border-accent/25 hover:text-slate-200",
+                            : "border-rule text-ink-3 hover:border-accent/25 hover:text-ink",
                         )}
                       >
                         {p.label}
                       </button>
                     ))}
                   </div>
-                  <p className="mt-2 text-[11px] text-slate-600">
+                  <p className="mt-2 text-[11px] text-ink-5">
                     This changes only what the browser displays &mdash; exactly the leverage a real
                     attacker has over their own machine.
                   </p>
@@ -327,7 +341,7 @@ function TimeLockDemo() {
                     {attempt.kind === "denied" && (
                       <Alert kind="locked" title="DECRYPTION BLOCKED">
                         <p>{attempt.message}</p>
-                        <p className="mt-2 text-slate-400">
+                        <p className="mt-2 text-ink-3">
                           Your computer clock has no bearing on this check.
                         </p>
                       </Alert>
@@ -346,9 +360,9 @@ function TimeLockDemo() {
                 )}
 
                 {clockIsFaked && !released && (
-                  <div className="mt-4 flex gap-2.5 rounded-lg border border-danger/25 bg-danger/[0.05] px-3.5 py-2.5">
+                  <div className="mt-4 flex gap-2.5 rounded-sm border border-danger/25 bg-danger/[0.05] px-3.5 py-2.5">
                     <AlertTriangle size={14} className="mt-0.5 shrink-0 text-danger" />
-                    <p className="text-[11px] leading-relaxed text-slate-400">
+                    <p className="text-[11px] leading-relaxed text-ink-3">
                       Your displayed clock says{" "}
                       <span className="font-mono text-danger">
                         {new Date(displayedClientClock * 1000).getFullYear()}
@@ -371,7 +385,7 @@ function TimeLockDemo() {
                 title="Released paper"
                 subtitle="Decrypted only after the contract transitioned the paper to RELEASED"
               >
-                <pre className="max-h-96 overflow-auto rounded-lg border border-white/[0.06] bg-base-950/70 p-4 font-mono text-[11px] leading-relaxed text-slate-300">
+                <pre className="max-h-96 overflow-auto rounded-sm border border-rule-soft bg-leaf p-4 font-mono text-[11px] leading-relaxed text-ink-2">
                   {content}
                 </pre>
               </Panel>
@@ -380,9 +394,9 @@ function TimeLockDemo() {
 
           <div className="mt-5">
             <Panel title="Why this holds" subtitle="The honest version, for judges">
-              <div className="grid gap-4 text-[13px] leading-relaxed text-slate-400 md:grid-cols-2">
+              <div className="grid gap-4 text-[13px] leading-relaxed text-ink-3 md:grid-cols-2">
                 <div>
-                  <p className="mb-1.5 flex items-center gap-2 font-medium text-slate-200">
+                  <p className="mb-1.5 flex items-center gap-2 font-medium text-ink">
                     <ShieldAlert size={14} className="text-accent" />
                     What is actually guaranteed
                   </p>
@@ -393,12 +407,12 @@ function TimeLockDemo() {
                   </p>
                 </div>
                 <div>
-                  <p className="mb-1.5 flex items-center gap-2 font-medium text-slate-200">
+                  <p className="mb-1.5 flex items-center gap-2 font-medium text-ink">
                     <Clock size={14} className="text-warn" />
                     What is not
                   </p>
                   <p>
-                    <code className="font-mono text-slate-300">block.timestamp</code> is not a
+                    <code className="font-mono text-ink-2">block.timestamp</code> is not a
                     perfect atomic clock &mdash; validators have some leeway, and on a permissioned
                     chain the validator set is a trust assumption. The claim is narrower: an ordinary
                     end user cannot bypass the condition from their own device.

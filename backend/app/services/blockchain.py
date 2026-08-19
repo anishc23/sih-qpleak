@@ -232,13 +232,33 @@ class BlockchainService:
         db.flush()
         return row
 
+    @staticmethod
+    def _classify(error: str) -> ChainTxStatus:
+        """
+        A contract that refuses is not a chain that is down.
+
+        UNAVAILABLE carries a specific promise -- the node could not be reached,
+        so we recorded the attempt rather than inventing a hash. A revert is the
+        opposite situation: the chain answered, and its answer was no. Filing
+        reverts under UNAVAILABLE hides real logic errors behind an outage
+        label, which is how a lifecycle bug sat unnoticed in the explorer.
+        """
+        lowered = error.lower()
+        if "execution reverted" in lowered or "custom error" in lowered:
+            return ChainTxStatus.FAILED
+        return ChainTxStatus.UNAVAILABLE
+
     def _unavailable(
         self, db: Session, *, contract: str, method: str, resource_type: str,
         resource_id: str, error: str,
     ) -> TxResult:
         """Record a genuine failure. No fake hash is ever produced."""
-        logger.warning("blockchain unavailable for %s.%s: %s", contract, method, error)
-        result = TxResult(ok=False, error=error, status=ChainTxStatus.UNAVAILABLE)
+        status = self._classify(error)
+        if status is ChainTxStatus.FAILED:
+            logger.warning("contract rejected %s.%s: %s", contract, method, error)
+        else:
+            logger.warning("blockchain unavailable for %s.%s: %s", contract, method, error)
+        result = TxResult(ok=False, error=error, status=status)
         self._record(
             db, contract=contract, method=method, resource_type=resource_type,
             resource_id=resource_id, result=result, address=None,

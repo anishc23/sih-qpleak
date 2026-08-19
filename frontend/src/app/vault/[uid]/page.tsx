@@ -104,24 +104,24 @@ export default function QuestionDetailPage() {
             {readError ? (
               <Alert kind="danger" title="READ denied">
                 <p>{readError}</p>
-                <p className="mt-2 text-slate-400">
+                <p className="mt-2 text-ink-3">
                   This refusal has been recorded in the access log and the audit trail.
                 </p>
               </Alert>
             ) : content ? (
               <>
-                <p className="whitespace-pre-wrap rounded-lg border border-white/[0.06] bg-base-950/60 p-4 text-[13px] leading-relaxed text-slate-200">
+                <p className="whitespace-pre-wrap rounded-sm border border-rule-soft bg-register/60 p-4 text-[13px] leading-relaxed text-ink">
                   {content}
                 </p>
-                <p className="mt-2.5 text-[11px] text-slate-600">
+                <p className="mt-2.5 text-[11px] text-ink-5">
                   Decrypted in memory for this request. A QUESTION_READ event was written and a
                   provenance event anchored on chain.
                 </p>
               </>
             ) : (
-              <div className="rounded-lg border border-dashed border-white/10 py-8 text-center">
-                <p className="text-sm text-slate-500">Content is encrypted at rest.</p>
-                <p className="mt-1 text-[11px] text-slate-600">
+              <div className="rounded-sm border border-dashed border-rule py-8 text-center">
+                <p className="text-sm text-ink-4">Content is encrypted at rest.</p>
+                <p className="mt-1 text-[11px] text-ink-5">
                   Your permissions: READ {question.permissions.read ? "granted" : "denied"}
                 </p>
               </div>
@@ -136,17 +136,17 @@ export default function QuestionDetailPage() {
                 {versions.map((v) => (
                   <li
                     key={v.version}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/[0.06] px-3.5 py-2.5"
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-sm border border-rule-soft px-3.5 py-2.5"
                   >
                     <div className="flex items-center gap-3">
                       <span className="font-mono text-xs text-accent">v{v.version}</span>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-ink-3">
                         {v.change_note ?? "No note"}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Hash value={v.content_hash} chars={14} />
-                      <span className="text-[10px] text-slate-600">
+                      <span className="text-[10px] text-ink-5">
                         {formatDateTime(v.created_at)}
                       </span>
                     </div>
@@ -166,11 +166,11 @@ export default function QuestionDetailPage() {
                     <span
                       className={`h-1.5 w-1.5 shrink-0 rounded-full ${e.success ? "bg-ok" : "bg-danger"}`}
                     />
-                    <span className="flex-1 text-slate-300">
+                    <span className="flex-1 text-ink-2">
                       {e.event_type.replace(/_/g, " ").toLowerCase()}
                     </span>
                     {e.blockchain_tx && <Hash value={e.blockchain_tx} chars={10} />}
-                    <span className="shrink-0 text-[10px] text-slate-600">
+                    <span className="shrink-0 text-[10px] text-ink-5">
                       {formatDateTime(e.created_at)}
                     </span>
                   </li>
@@ -184,12 +184,12 @@ export default function QuestionDetailPage() {
           <Panel title="Cryptographic identity">
             <div className="space-y-2.5 text-xs">
               <Row label="Content hash" value={<Hash value={question.content_hash} chars={22} />} />
-              <Row label="Author" value={<span className="text-slate-300">{question.creator_name}</span>} />
-              <Row label="Author UID" value={<span className="font-mono text-slate-400">{question.creator_uid}</span>} />
-              <Row label="Marks" value={<span className="text-slate-300">{question.marks}</span>} />
-              <Row label="Type" value={<span className="text-slate-300">{question.question_type.replace(/_/g, " ").toLowerCase()}</span>} />
-              <Row label="Created" value={<span className="text-slate-400">{formatDateTime(question.created_at)}</span>} />
-              <Row label="Approved" value={<span className="text-slate-400">{formatDateTime(question.approved_at)}</span>} />
+              <Row label="Author" value={<span className="text-ink-2">{question.creator_name}</span>} />
+              <Row label="Author UID" value={<span className="font-mono text-ink-3">{question.creator_uid}</span>} />
+              <Row label="Marks" value={<span className="text-ink-2">{question.marks}</span>} />
+              <Row label="Type" value={<span className="text-ink-2">{question.question_type.replace(/_/g, " ").toLowerCase()}</span>} />
+              <Row label="Created" value={<span className="text-ink-3">{formatDateTime(question.created_at)}</span>} />
+              <Row label="Approved" value={<span className="text-ink-3">{formatDateTime(question.approved_at)}</span>} />
             </div>
           </Panel>
 
@@ -238,15 +238,15 @@ export default function QuestionDetailPage() {
                     >
                       {a.access_type}
                     </span>
-                    <span className="flex-1 truncate text-slate-400">{a.user_name}</span>
-                    <span className="shrink-0 text-[10px] text-slate-600">
+                    <span className="flex-1 truncate text-ink-3">{a.user_name}</span>
+                    <span className="shrink-0 text-[10px] text-ink-5">
                       {a.granted ? "granted" : "denied"}
                     </span>
                   </li>
                 ))}
               </ul>
             )}
-            <p className="mt-3 flex items-center gap-1.5 text-[11px] text-slate-600">
+            <p className="mt-3 flex items-center gap-1.5 text-[11px] text-ink-5">
               <History size={11} />
               Reading a question is itself a security-sensitive event.
             </p>
@@ -259,8 +259,8 @@ export default function QuestionDetailPage() {
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 border-b border-white/[0.04] pb-2 last:border-0">
-      <span className="shrink-0 text-slate-500">{label}</span>
+    <div className="flex items-baseline justify-between gap-4 border-b border-rule-soft pb-2 last:border-0">
+      <span className="shrink-0 text-ink-4">{label}</span>
       <span className="text-right">{value}</span>
     </div>
   );

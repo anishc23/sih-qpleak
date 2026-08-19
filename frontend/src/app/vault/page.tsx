@@ -74,7 +74,7 @@ export default function VaultPage() {
       <Panel>
         <div className="mb-4 flex flex-wrap gap-2">
           <div className="relative min-w-56 flex-1">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-5" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -107,10 +107,10 @@ export default function VaultPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/[0.07] text-left">
+                <tr className="border-b border-rule text-left">
                   {["ID", "Topic", "Difficulty", "Marks", "Ver", "Status", "Author", "Hash", "Perms"].map(
                     (h) => (
-                      <th key={h} className="px-2 py-2.5 text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                      <th key={h} className="px-2 py-2.5 text-[11px] font-medium uppercase tracking-wider text-ink-4">
                         {h}
                       </th>
                     ),
@@ -119,7 +119,7 @@ export default function VaultPage() {
               </thead>
               <tbody>
                 {filtered.map((q) => (
-                  <tr key={q.question_uid} className="border-b border-white/[0.04] transition hover:bg-white/[0.02]">
+                  <tr key={q.question_uid} className="border-b border-rule-soft transition hover:bg-sunk">
                     <td className="px-2 py-2.5">
                       <Link
                         href={`/vault/${q.question_uid}`}
@@ -128,16 +128,16 @@ export default function VaultPage() {
                         {q.question_uid}
                       </Link>
                     </td>
-                    <td className="px-2 py-2.5 text-slate-300">{q.topic}</td>
+                    <td className="px-2 py-2.5 text-ink-2">{q.topic}</td>
                     <td className="px-2 py-2.5">
                       <DifficultyBadge difficulty={q.difficulty} />
                     </td>
-                    <td className="px-2 py-2.5 tabular-nums text-slate-400">{q.marks}</td>
-                    <td className="px-2 py-2.5 font-mono text-xs text-slate-500">v{q.version}</td>
+                    <td className="px-2 py-2.5 tabular-nums text-ink-3">{q.marks}</td>
+                    <td className="px-2 py-2.5 font-mono text-xs text-ink-4">v{q.version}</td>
                     <td className="px-2 py-2.5">
                       <StatusBadge status={q.status} />
                     </td>
-                    <td className="px-2 py-2.5 text-xs text-slate-400">{q.creator_name}</td>
+                    <td className="px-2 py-2.5 text-xs text-ink-3">{q.creator_name}</td>
                     <td className="px-2 py-2.5">
                       <Hash value={q.content_hash} chars={10} />
                     </td>
@@ -152,7 +152,7 @@ export default function VaultPage() {
         )}
 
         {filtered && (
-          <p className="mt-4 flex items-center gap-2 text-[11px] text-slate-600">
+          <p className="mt-4 flex items-center gap-2 text-[11px] text-ink-5">
             <VaultIcon size={12} />
             {filtered.length} question{filtered.length === 1 ? "" : "s"} visible to you. R/W/A shows
             your independent READ, WRITE and APPROVE grants on each.

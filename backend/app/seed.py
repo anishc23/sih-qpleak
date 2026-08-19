@@ -32,6 +32,7 @@ from app.models import (
 )
 from app.security.passwords import hash_password
 from app.services import questions as question_service
+from app.services.blockchain import blockchain
 
 DEMO_PASSWORD = "SecureLock#2026"
 
@@ -193,16 +194,51 @@ def seed() -> None:
 
         # Move most through the workflow to APPROVED so a paper can be built,
         # leaving a few in review so the reviewer queue is not empty.
+        #
+        # The database status and the on-chain lifecycle have to move together.
+        # Setting `question.status` alone leaves the chain believing every
+        # question is still a DRAFT, and the contract then rightly rejects the
+        # DRAFT -> SELECTED jump that synthesis attempts -- which is how a batch
+        # of questions used to end up with no provenance recorded at all.
+        #
+        # On-chain Lifecycle enum: NONE, DRAFT, SUBMITTED, UNDER_REVIEW,
+        # APPROVED, REJECTED, SELECTED, USED_IN_PAPER, RETIRED.
+        CHAIN_SUBMITTED, CHAIN_UNDER_REVIEW, CHAIN_APPROVED = 2, 3, 4
+
         approved = 0
+        anchored = 0
+        chain_failures = 0
         for index, question in enumerate(created):
             if index % 9 == 4:  # leave roughly one in nine pending review
                 question.status = QuestionStatus.SUBMITTED
-                continue
-            question.status = QuestionStatus.AVAILABLE_FOR_SYNTHESIS
-            question.approved_at = datetime.now(timezone.utc)
-            question.approved_by = reviewer.id
-            approved += 1
+                steps = (CHAIN_SUBMITTED,)
+            else:
+                question.status = QuestionStatus.AVAILABLE_FOR_SYNTHESIS
+                question.approved_at = datetime.now(timezone.utc)
+                question.approved_by = reviewer.id
+                approved += 1
+                steps = (CHAIN_SUBMITTED, CHAIN_UNDER_REVIEW, CHAIN_APPROVED)
+
+            for lifecycle in steps:
+                tx = blockchain.set_lifecycle(
+                    db,
+                    question_uid=question.question_uid,
+                    lifecycle=lifecycle,
+                    actor_uid=reviewer.user_uid,
+                )
+                if tx.ok:
+                    anchored += 1
+                else:
+                    chain_failures += 1
+
         print(f"Approved {approved} questions; {len(created) - approved} left in review queue.")
+        if chain_failures:
+            print(
+                f"Anchored {anchored} lifecycle transitions on chain; "
+                f"{chain_failures} could not be recorded."
+            )
+        else:
+            print(f"Anchored {anchored} lifecycle transitions on chain.")
 
         authority = users["authority@securelock.demo"]
         exam = Exam(

@@ -79,9 +79,9 @@ export default function ReviewQueuePage() {
                     <span className="font-mono text-sm text-accent">{q.question_uid}</span>
                     <StatusBadge status={q.status} />
                     <DifficultyBadge difficulty={q.difficulty} />
-                    <span className="text-xs text-slate-500">{q.marks} marks</span>
+                    <span className="text-xs text-ink-4">{q.marks} marks</span>
                   </div>
-                  <p className="mt-1.5 text-xs text-slate-500">
+                  <p className="mt-1.5 text-xs text-ink-4">
                     {q.topic} &middot; by {q.creator_name} &middot; v{q.version}
                   </p>
                 </div>
@@ -90,7 +90,7 @@ export default function ReviewQueuePage() {
 
               <div className="mt-4">
                 {contents[q.question_uid] ? (
-                  <p className="whitespace-pre-wrap rounded-lg border border-white/[0.06] bg-base-950/60 p-4 text-[13px] leading-relaxed text-slate-200">
+                  <p className="whitespace-pre-wrap rounded-sm border border-rule-soft bg-register/60 p-4 text-[13px] leading-relaxed text-ink">
                     {contents[q.question_uid]}
                   </p>
                 ) : (

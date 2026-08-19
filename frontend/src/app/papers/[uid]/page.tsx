@@ -96,11 +96,11 @@ export default function PaperDetailPage() {
               <Row label="Contract" value={<Hash value={paper.contract_address} chars={20} />} />
               <Row label="Registration tx" value={<Hash value={paper.registration_tx} chars={20} />} />
               <Row label="Release tx" value={<Hash value={paper.release_tx} chars={20} />} />
-              <Row label="Release time" value={<span className="text-slate-300">{formatDateTime(paper.release_time)}</span>} />
-              <Row label="Released at" value={<span className="text-slate-300">{formatDateTime(paper.released_at)}</span>} />
+              <Row label="Release time" value={<span className="text-ink-2">{formatDateTime(paper.release_time)}</span>} />
+              <Row label="Released at" value={<span className="text-ink-2">{formatDateTime(paper.released_at)}</span>} />
             </div>
 
-            <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-white/[0.06] pt-4">
+            <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-rule-soft pt-4">
               {(paper.status === "DRAFT" || paper.status === "PENDING_APPROVAL") && (
                 <button
                   onClick={() => run(() => api.encryptPaper(uid), "Paper encrypted with AES-256-GCM.")}
@@ -175,13 +175,13 @@ export default function PaperDetailPage() {
             ) : (
               <div className="space-y-2">
                 {paper.questions.map((q) => (
-                  <div key={q.sequence} className="rounded-lg border border-white/[0.06] px-3.5 py-2.5">
+                  <div key={q.sequence} className="rounded-sm border border-rule-soft px-3.5 py-2.5">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono text-[11px] text-accent">Q{q.sequence}</span>
-                      <span className="font-mono text-[11px] text-slate-500">{q.question_uid}</span>
+                      <span className="font-mono text-[11px] text-ink-4">{q.question_uid}</span>
                       <DifficultyBadge difficulty={q.difficulty} />
-                      <span className="text-[11px] text-slate-500">{q.topic}</span>
-                      <span className="text-[11px] text-slate-500">{q.marks} marks</span>
+                      <span className="text-[11px] text-ink-4">{q.topic}</span>
+                      <span className="text-[11px] text-ink-4">{q.marks} marks</span>
                       {q.used_variation && (
                         <span className="rounded bg-locked/12 px-1.5 py-0.5 text-[10px] text-locked">
                           variation queued
@@ -189,7 +189,7 @@ export default function PaperDetailPage() {
                       )}
                     </div>
                     {q.selection_reason && (
-                      <p className="mt-1.5 text-[11px] text-slate-600">{q.selection_reason}</p>
+                      <p className="mt-1.5 text-[11px] text-ink-5">{q.selection_reason}</p>
                     )}
                   </div>
                 ))}
@@ -206,8 +206,8 @@ export default function PaperDetailPage() {
                 <Meter label="Topic" value={compliance.topic_compliance} />
                 <Meter label="Marks" value={compliance.marks_compliance} />
               </div>
-              <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3 text-xs">
-                <span className="text-slate-500">Duplicate risk</span>
+              <div className="mt-4 flex items-center justify-between border-t border-rule-soft pt-3 text-xs">
+                <span className="text-ink-4">Duplicate risk</span>
                 <RiskBadge risk={compliance.duplicate_risk} />
               </div>
             </Panel>
@@ -223,11 +223,11 @@ export default function PaperDetailPage() {
                     <span
                       className={`h-1.5 w-1.5 shrink-0 rounded-full ${e.success ? "bg-ok" : "bg-danger"}`}
                     />
-                    <span className="flex-1 truncate text-slate-300">
+                    <span className="flex-1 truncate text-ink-2">
                       {e.event_type.replace(/_/g, " ").toLowerCase()}
                     </span>
                     {e.blockchain_tx && <Blocks size={11} className="shrink-0 text-accent" />}
-                    <span className="shrink-0 text-[10px] text-slate-600">
+                    <span className="shrink-0 text-[10px] text-ink-5">
                       {formatDateTime(e.created_at).split(", ")[1]}
                     </span>
                   </li>
@@ -243,8 +243,8 @@ export default function PaperDetailPage() {
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 border-b border-white/[0.04] pb-2 last:border-0">
-      <span className="shrink-0 text-slate-500">{label}</span>
+    <div className="flex items-baseline justify-between gap-4 border-b border-rule-soft pb-2 last:border-0">
+      <span className="shrink-0 text-ink-4">{label}</span>
       <span className="text-right">{value}</span>
     </div>
   );

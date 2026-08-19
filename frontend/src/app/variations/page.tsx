@@ -69,7 +69,7 @@ export default function VariationsPage() {
                   <Sparkles size={14} className="text-locked" />
                   <span className="font-mono text-sm text-accent">{v.question_uid}</span>
                   <DifficultyBadge difficulty={v.difficulty} />
-                  <span className="text-xs text-slate-500">{v.topic}</span>
+                  <span className="text-xs text-ink-4">{v.topic}</span>
                 </div>
                 <span
                   className={`rounded px-2 py-0.5 text-[11px] font-medium ${
@@ -87,7 +87,7 @@ export default function VariationsPage() {
               <div className="grid gap-3 lg:grid-cols-[1fr_auto_1fr]">
                 <div>
                   <p className="label mb-1.5">Original</p>
-                  <p className="rounded-lg border border-white/[0.06] bg-base-950/60 p-3.5 text-[13px] leading-relaxed text-slate-300">
+                  <p className="rounded-sm border border-rule-soft bg-register/60 p-3.5 text-[13px] leading-relaxed text-ink-2">
                     {v.original}
                   </p>
                   <div className="mt-1.5">
@@ -96,12 +96,12 @@ export default function VariationsPage() {
                 </div>
 
                 <div className="flex items-center justify-center">
-                  <ArrowRight size={16} className="text-slate-700" />
+                  <ArrowRight size={16} className="text-ink-6" />
                 </div>
 
                 <div>
                   <p className="label mb-1.5">Generated variation</p>
-                  <p className="rounded-lg border border-locked/20 bg-locked/[0.04] p-3.5 text-[13px] leading-relaxed text-slate-200">
+                  <p className="rounded-sm border border-locked/20 bg-locked/[0.04] p-3.5 text-[13px] leading-relaxed text-ink">
                     {v.variation}
                   </p>
                   <div className="mt-1.5">
@@ -110,16 +110,16 @@ export default function VariationsPage() {
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-3.5">
-                <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-500">
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-rule-soft pt-3.5">
+                <div className="flex flex-wrap items-center gap-4 text-[11px] text-ink-4">
                   <span>
                     Similarity{" "}
-                    <span className="font-mono text-slate-300">
+                    <span className="font-mono text-ink-2">
                       {(v.similarity_score * 100).toFixed(0)}%
                     </span>
                   </span>
                   <span>
-                    Rule <span className="font-mono text-slate-400">{v.generation_method}</span>
+                    Rule <span className="font-mono text-ink-3">{v.generation_method}</span>
                   </span>
                 </div>
                 {v.review_status === "PENDING" && (

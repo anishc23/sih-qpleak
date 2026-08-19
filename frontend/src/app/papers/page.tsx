@@ -36,21 +36,21 @@ export default function PapersPage() {
               <Link
                 key={p.paper_uid}
                 href={`/papers/${p.paper_uid}`}
-                className="block rounded-lg border border-white/[0.06] px-4 py-3.5 transition hover:border-accent/25 hover:bg-white/[0.02]"
+                className="block rounded-sm border border-rule-soft px-4 py-3.5 transition hover:border-accent/25 hover:bg-sunk"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <FileStack size={15} className="text-slate-600" />
+                    <FileStack size={15} className="text-ink-5" />
                     <div>
-                      <p className="font-mono text-sm text-slate-200">{p.paper_uid}</p>
-                      <p className="mt-0.5 text-[11px] text-slate-500">
+                      <p className="font-mono text-sm text-ink">{p.paper_uid}</p>
+                      <p className="mt-0.5 text-[11px] text-ink-4">
                         {p.exam_title} &middot; {p.question_count} questions
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-4">
                     <Hash value={p.paper_hash} chars={14} />
-                    <span className="text-[11px] text-slate-600">
+                    <span className="text-[11px] text-ink-5">
                       {formatDateTime(p.created_at)}
                     </span>
                     <PaperBadge status={p.status} />

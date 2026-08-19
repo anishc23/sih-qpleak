@@ -1,160 +1,113 @@
-import {
-  Activity,
-  Blocks,
-  Fingerprint,
-  KeyRound,
-  LockKeyhole,
-  ShieldCheck,
-  Sparkles,
-  Timer,
-} from "lucide-react";
 import Link from "next/link";
+import Seal from "@/components/Seal";
 
-const PILLARS = [
-  {
-    icon: KeyRound,
-    title: "Question Encryption",
-    body: "Every question gets its own AES-256-GCM key. Plaintext is never written to the database.",
-  },
-  {
-    icon: Fingerprint,
-    title: "Question Provenance",
-    body: "SHA-256 identity and append-only version history, anchored on chain. Edits cannot masquerade as originals.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Granular Access",
-    body: "READ, WRITE and APPROVE are independent grants, enforced server-side on every request.",
-  },
-  {
-    icon: Sparkles,
-    title: "Paper Synthesis",
-    body: "TF-IDF duplicate detection and a seeded optimiser assemble the paper, spreading authorship.",
-  },
-  {
-    icon: Timer,
-    title: "Smart Time Lock",
-    body: "Release is gated on block.timestamp. A changed device clock does not move it.",
-  },
-  {
-    icon: Activity,
-    title: "Immutable Audit",
-    body: "A hash-chained log whose head is anchored on chain, so silent edits become visible.",
-  },
-];
-
-const FLOW = [
-  "Question created",
-  "Encrypted + hashed",
-  "Provenance anchored",
-  "Reviewed",
-  "Synthesised",
-  "Paper encrypted",
-  "Time locked",
-  "Released at exam time",
+/** The custody chain, as a register reads it: what happened, and what it left behind. */
+const CUSTODY = [
+  ["01", "Question written", "Encrypted with its own AES-256-GCM key before it touches disk"],
+  ["02", "Identity fixed", "SHA-256 digest of the plaintext, anchored on chain"],
+  ["03", "Version opened", "Edits append. Nothing overwrites, so nothing edited can pose as original"],
+  ["04", "Reviewed", "APPROVE is granted on its own — a reviewer never needs WRITE"],
+  ["05", "Paper assembled", "A seeded optimiser draws from the pool; no setter can predict the draw"],
+  ["06", "Paper sealed", "Encrypted, its digest registered against a release hour"],
+  ["07", "Access refused", "Every denial is written to the register and anchored"],
+  ["08", "Opened at the hour", "The contract compares block.timestamp and permits the release"],
 ];
 
 export default function Landing() {
   return (
     <div className="min-h-screen">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/12 ring-1 ring-accent/25">
-            <LockKeyhole size={18} className="text-accent" />
-          </div>
-          <span className="text-base font-semibold tracking-tight text-white">SecureLock</span>
-        </div>
-        <Link href="/login" className="btn-ghost">
+      <header className="mx-auto flex max-w-6xl items-baseline justify-between px-6 py-7">
+        <span className="font-display text-lg font-semibold tracking-tight text-ink">SecureLock</span>
+        <Link
+          href="/login"
+          className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3 underline-offset-4 hover:text-ink hover:underline"
+        >
           Sign in
         </Link>
       </header>
 
-      <section className="mx-auto max-w-6xl px-6 pb-16 pt-10 lg:pt-20">
-        <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/[0.06] px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-accent">
-          <Blocks size={12} />
-          Smart India Hackathon prototype
-        </div>
+      {/* The register spread: the account on the left, the sealed object in the
+          custody column on the right, a real rule between them. */}
+      <section className="mx-auto max-w-6xl px-6 pb-20 pt-8 lg:pt-16">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-16">
+          <div className="lg:border-r lg:border-rule lg:pr-16">
+            <h1 className="max-w-xl font-display text-[2.6rem] font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl">
+              A question paper leaks weeks before the paper exists.
+            </h1>
 
-        <h1 className="mt-6 max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight text-white lg:text-6xl">
-          Blockchain + AI powered{" "}
-          <span className="bg-gradient-to-r from-accent to-locked bg-clip-text text-transparent">
-            examination security
-          </span>
-        </h1>
+            <p className="mt-7 max-w-lg text-[15px] leading-relaxed text-ink-3">
+              Most systems guard the finished PDF. By then the questions have already been written
+              on somebody&rsquo;s laptop, mailed to a reviewer, and pasted into a draft.
+            </p>
 
-        <p className="mt-5 max-w-2xl text-lg text-slate-400">
-          Secure every question. Trace every access. Lock every paper.
-        </p>
+            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink-3">
+              SecureLock seals each question with its own key the moment it is written. Every
+              hand-off after that is recorded where a database administrator cannot quietly revise
+              it. The assembled paper stays shut until the contract says the hour has come.
+            </p>
 
-        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-500">
-          Most systems protect the final question paper. But a paper can be compromised long before
-          it exists &mdash; while questions are being written, reviewed and assembled. SecureLock
-          secures that entire lifecycle.
-        </p>
-
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/login" className="btn-primary">
-            Enter Secure Examination Portal
-          </Link>
-          <Link href="/timelock" className="btn-ghost">
-            <Timer size={15} />
-            See the time-lock demo
-          </Link>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 pb-16">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {PILLARS.map(({ icon: Icon, title, body }) => (
-            <div key={title} className="panel panel-hover p-5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10 ring-1 ring-accent/20">
-                <Icon size={16} className="text-accent" />
-              </div>
-              <h3 className="mt-3.5 text-sm font-semibold text-white">{title}</h3>
-              <p className="mt-1.5 text-[13px] leading-relaxed text-slate-500">{body}</p>
+            <div className="mt-9 flex flex-wrap items-center gap-5">
+              <Link href="/login" className="btn-primary">
+                Open the register
+              </Link>
+              <Link
+                href="/timelock"
+                className="text-sm text-ink-2 underline decoration-rule underline-offset-4 hover:text-ink hover:decoration-ink"
+              >
+                Watch a paper refuse to open &rarr;
+              </Link>
             </div>
+          </div>
+
+          <Seal />
+        </div>
+      </section>
+
+      {/* Custody chain: a logbook has columns, not cards. */}
+      <section className="mx-auto max-w-6xl px-6 pb-20">
+        <h2 className="colhead">Chain of custody</h2>
+        <ol className="ruled mt-1">
+          {CUSTODY.map(([n, event, detail]) => (
+            <li
+              key={n}
+              className="grid grid-cols-[2rem_1fr] gap-x-5 py-3.5 sm:grid-cols-[2rem_13rem_1fr]"
+            >
+              <span className="font-mono text-[11px] text-ink-5 tabular-nums">{n}</span>
+              <span className="text-sm text-ink">{event}</span>
+              <span className="col-start-2 text-[13px] leading-relaxed text-ink-4 sm:col-start-3">
+                {detail}
+              </span>
+            </li>
           ))}
-        </div>
+        </ol>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="panel p-6">
-          <h2 className="text-sm font-semibold text-white">The secured lifecycle</h2>
-          <ol className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-3">
-            {FLOW.map((step, i) => (
-              <li key={step} className="flex items-center gap-2">
-                <span className="rounded-lg border border-white/[0.07] bg-base-850 px-3 py-1.5 text-xs text-slate-300">
-                  <span className="mr-2 font-mono text-[10px] text-accent">{i + 1}</span>
-                  {step}
-                </span>
-                {i < FLOW.length - 1 && <span className="text-slate-700">&rarr;</span>}
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="panel border-warn/15 bg-warn/[0.03] p-6">
-          <h2 className="text-sm font-semibold text-warn">What we do not claim</h2>
-          <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-slate-400">
-            SecureLock does not make examination leaks impossible. A person who is authorised to see
-            a question can still photograph it. Blockchain does not prove a human read anything
-            &mdash; only that an authorised account requested it through the system. And{" "}
-            <code className="font-mono text-slate-300">block.timestamp</code> is not a perfect
-            clock; the accurate claim is that an end user cannot bypass the release condition from
-            their own device.
+      <section className="mx-auto max-w-6xl px-6 pb-24">
+        <h2 className="colhead">What this does not do</h2>
+        <div className="mt-5 grid gap-x-16 gap-y-4 text-[13px] leading-relaxed text-ink-3 sm:grid-cols-2">
+          <p>
+            It does not make a leak impossible. Somebody authorised to read a question can still
+            photograph the screen.
           </p>
-          <p className="mt-3 max-w-3xl text-[13px] leading-relaxed text-slate-400">
-            What the system does provide: reduced exposure, traceable provenance, tamper-evident
-            records, and a release condition no single administrator can quietly override.
+          <p>
+            It does not prove a human read anything. It proves an authorised account asked this
+            system for it, at a recorded moment.
+          </p>
+          <p>
+            <code className="font-mono text-ink-2">block.timestamp</code> is not a perfect clock.
+            Validators have some leeway. The claim that holds is narrower: an end user cannot move
+            it from their own device.
+          </p>
+          <p>
+            The synthesis engine reduces how predictable a paper is. That is a change in odds, not a
+            guarantee, and it is rule-based rather than a language model.
           </p>
         </div>
       </section>
 
-      <footer className="border-t border-white/[0.06] py-8">
-        <p className="text-center text-xs text-slate-600">
-          SecureLock &mdash; SIH internal hackathon prototype. Runs entirely offline.
+      <footer className="border-t border-rule">
+        <p className="mx-auto max-w-6xl px-6 py-7 font-mono text-[11px] text-ink-5">
+          SecureLock — internal prototype, Smart India Hackathon. Runs offline on one machine.
         </p>
       </footer>
     </div>

@@ -78,13 +78,13 @@ export default function SecurityPage() {
             ) : (
               <>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Status</span>
+                  <span className="text-ink-4">Status</span>
                   <span className={data.audit_chain.intact ? "text-ok" : "text-danger"}>
                     {data.audit_chain.intact ? "INTACT" : "BROKEN"}
                   </span>
                 </div>
                 <div className="mt-2 flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Chain head</span>
+                  <span className="text-ink-4">Chain head</span>
                   <Hash value={data.audit_chain.head} chars={18} />
                 </div>
               </>
@@ -103,14 +103,14 @@ export default function SecurityPage() {
               ].map(([k, v]) => (
                 <div
                   key={k}
-                  className="flex items-center justify-between border-b border-white/[0.04] pb-1.5 last:border-0"
+                  className="flex items-center justify-between border-b border-rule-soft pb-1.5 last:border-0"
                 >
-                  <span className="text-slate-500">{k}</span>
-                  <span className="font-mono text-[11px] text-slate-300">{v}</span>
+                  <span className="text-ink-4">{k}</span>
+                  <span className="font-mono text-[11px] text-ink-2">{v}</span>
                 </div>
               ))}
             </div>
-            <p className="mt-3 text-[11px] leading-relaxed text-slate-600">
+            <p className="mt-3 text-[11px] leading-relaxed text-ink-5">
               No primitive is implemented by hand. AES-GCM is authenticated encryption, so a
               tampered ciphertext fails to decrypt rather than returning garbage.
             </p>
@@ -123,11 +123,11 @@ export default function SecurityPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/[0.07] text-left">
+                <tr className="border-b border-rule text-left">
                   {["", "Threat", "Countermeasure"].map((h) => (
                     <th
                       key={h}
-                      className="px-2 py-2 text-[11px] font-medium uppercase tracking-wider text-slate-500"
+                      className="px-2 py-2 text-[11px] font-medium uppercase tracking-wider text-ink-4"
                     >
                       {h}
                     </th>
@@ -136,10 +136,10 @@ export default function SecurityPage() {
               </thead>
               <tbody>
                 {THREATS.map(([id, threat, counter]) => (
-                  <tr key={id} className="border-b border-white/[0.04]">
+                  <tr key={id} className="border-b border-rule-soft">
                     <td className="px-2 py-2 font-mono text-[11px] text-accent">{id}</td>
-                    <td className="px-2 py-2 text-slate-300">{threat}</td>
-                    <td className="px-2 py-2 text-slate-400">{counter}</td>
+                    <td className="px-2 py-2 text-ink-2">{threat}</td>
+                    <td className="px-2 py-2 text-ink-3">{counter}</td>
                   </tr>
                 ))}
               </tbody>
@@ -150,7 +150,7 @@ export default function SecurityPage() {
 
       <div className="mt-5">
         <Panel title="Limitations we state openly">
-          <ul className="space-y-2.5 text-[13px] leading-relaxed text-slate-400">
+          <ul className="space-y-2.5 text-[13px] leading-relaxed text-ink-3">
             {[
               "Whoever holds the master key can decrypt the database. In production that key belongs in a KMS or HSM; the key-vault interface is deliberately narrow so it can be swapped.",
               "A local development chain is not a real trust anchor. It demonstrates the mechanism; production would use a permissioned chain with independent validators.",
@@ -160,7 +160,7 @@ export default function SecurityPage() {
               "Nothing here prevents an authorised person from photographing a question. The goal is to reduce exposure, trace access, and make tampering evident.",
             ].map((x) => (
               <li key={x} className="flex gap-2.5">
-                <ShieldCheck size={14} className="mt-0.5 shrink-0 text-slate-600" />
+                <ShieldCheck size={14} className="mt-0.5 shrink-0 text-ink-5" />
                 {x}
               </li>
             ))}

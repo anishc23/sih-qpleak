@@ -99,7 +99,7 @@ export default function PaperBuilderPage() {
                             {Object.entries(exam.blueprint.difficulty_distribution).map(([k, v]) => (
                               <span
                                 key={k}
-                                className="rounded border border-white/10 px-2 py-0.5 text-[11px] text-slate-400"
+                                className="rounded border border-rule px-2 py-0.5 text-[11px] text-ink-3"
                               >
                                 {k.toLowerCase()} {v}%
                               </span>
@@ -112,7 +112,7 @@ export default function PaperBuilderPage() {
                             {Object.entries(exam.blueprint.topic_distribution).map(([k, v]) => (
                               <span
                                 key={k}
-                                className="rounded border border-white/10 px-2 py-0.5 text-[11px] text-slate-400"
+                                className="rounded border border-rule px-2 py-0.5 text-[11px] text-ink-3"
                               >
                                 {k} {v}%
                               </span>
@@ -124,7 +124,7 @@ export default function PaperBuilderPage() {
                   </div>
                 )}
 
-                <label className="mt-4 flex cursor-pointer items-start gap-2.5 rounded-lg border border-white/[0.07] px-3.5 py-2.5">
+                <label className="mt-4 flex cursor-pointer items-start gap-2.5 rounded-sm border border-rule px-3.5 py-2.5">
                   <input
                     type="checkbox"
                     checked={applyVariations}
@@ -132,8 +132,8 @@ export default function PaperBuilderPage() {
                     className="mt-0.5 accent-cyan-400"
                   />
                   <div>
-                    <p className="text-xs text-slate-300">Generate question variations</p>
-                    <p className="mt-0.5 text-[11px] text-slate-600">
+                    <p className="text-xs text-ink-2">Generate question variations</p>
+                    <p className="mt-0.5 text-[11px] text-ink-5">
                       Rule-based rewording, queued for reviewer approval. Not a language model.
                     </p>
                   </div>
@@ -156,12 +156,12 @@ export default function PaperBuilderPage() {
             ) : (
               <>
                 <div className="mb-3 grid grid-cols-2 gap-2 text-xs">
-                  <div className="rounded-lg bg-base-850/60 px-3 py-2">
-                    <p className="text-slate-500">Pool</p>
-                    <p className="mt-0.5 text-base font-semibold text-white">{duplicates.pool_size}</p>
+                  <div className="rounded-sm bg-sunk/60 px-3 py-2">
+                    <p className="text-ink-4">Pool</p>
+                    <p className="mt-0.5 text-base font-semibold text-ink">{duplicates.pool_size}</p>
                   </div>
-                  <div className="rounded-lg bg-base-850/60 px-3 py-2">
-                    <p className="text-slate-500">High risk</p>
+                  <div className="rounded-sm bg-sunk/60 px-3 py-2">
+                    <p className="text-ink-4">High risk</p>
                     <p
                       className={`mt-0.5 text-base font-semibold ${duplicates.high_risk ? "text-danger" : "text-ok"}`}
                     >
@@ -175,11 +175,11 @@ export default function PaperBuilderPage() {
                   <ul className="space-y-1.5">
                     {duplicates.pairs.slice(0, 8).map((p, i) => (
                       <li key={i} className="flex items-center gap-2 text-xs">
-                        <Copy size={11} className="shrink-0 text-slate-600" />
-                        <span className="font-mono text-[11px] text-slate-400">
+                        <Copy size={11} className="shrink-0 text-ink-5" />
+                        <span className="font-mono text-[11px] text-ink-3">
                           {p.left} ~ {p.right}
                         </span>
-                        <span className="ml-auto tabular-nums text-slate-300">
+                        <span className="ml-auto tabular-nums text-ink-2">
                           {(p.similarity * 100).toFixed(0)}%
                         </span>
                         <RiskBadge risk={p.risk} />
@@ -195,7 +195,7 @@ export default function PaperBuilderPage() {
         <div className="space-y-5">
           {!paper ? (
             <Panel title="Selection pipeline">
-              <ol className="space-y-3 text-[13px] text-slate-400">
+              <ol className="space-y-3 text-[13px] text-ink-3">
                 {[
                   ["Collect approved candidates", "only questions that passed review"],
                   ["Build TF-IDF vectors", "computed locally, no external model"],
@@ -210,14 +210,14 @@ export default function PaperBuilderPage() {
                       {i + 1}
                     </span>
                     <div>
-                      <p className="text-slate-300">{t}</p>
-                      <p className="text-[11px] text-slate-600">{s}</p>
+                      <p className="text-ink-2">{t}</p>
+                      <p className="text-[11px] text-ink-5">{s}</p>
                     </div>
                   </li>
                 ))}
               </ol>
-              <div className="mt-4 rounded-lg border border-warn/20 bg-warn/[0.04] px-3.5 py-2.5">
-                <p className="text-[11px] leading-relaxed text-slate-400">
+              <div className="mt-4 rounded-sm border border-warn/20 bg-warn/[0.04] px-3.5 py-2.5">
+                <p className="text-[11px] leading-relaxed text-ink-3">
                   This reduces how well any one setter can predict the final paper. It is a
                   probabilistic improvement, not a guarantee &mdash; and the system does not claim
                   otherwise.
@@ -242,13 +242,13 @@ export default function PaperBuilderPage() {
                     <Meter label="Topic distribution" value={compliance.topic_compliance} />
                     <Meter label="Marks distribution" value={compliance.marks_compliance} />
                   </div>
-                  <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3.5 text-xs">
-                    <span className="text-slate-500">Residual duplicate risk</span>
+                  <div className="mt-4 flex items-center justify-between border-t border-rule-soft pt-3.5 text-xs">
+                    <span className="text-ink-4">Residual duplicate risk</span>
                     <RiskBadge risk={compliance.duplicate_risk} />
                   </div>
                   <div className="mt-2 flex items-center justify-between text-xs">
-                    <span className="text-slate-500">Marks</span>
-                    <span className="tabular-nums text-slate-300">
+                    <span className="text-ink-4">Marks</span>
+                    <span className="tabular-nums text-ink-2">
                       {compliance.marks_actual} / {compliance.marks_target}
                     </span>
                   </div>
@@ -266,18 +266,18 @@ export default function PaperBuilderPage() {
               <Panel title="Selected questions" subtitle="With the engine's reasoning for each">
                 <div className="max-h-96 space-y-2 overflow-auto">
                   {paper.questions?.map((q) => (
-                    <div key={q.sequence} className="rounded-lg border border-white/[0.06] px-3.5 py-2.5">
+                    <div key={q.sequence} className="rounded-sm border border-rule-soft px-3.5 py-2.5">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-mono text-[11px] text-accent">Q{q.sequence}</span>
-                        <span className="font-mono text-[11px] text-slate-500">{q.question_uid}</span>
+                        <span className="font-mono text-[11px] text-ink-4">{q.question_uid}</span>
                         <DifficultyBadge difficulty={q.difficulty} />
-                        <span className="text-[11px] text-slate-500">{q.topic}</span>
-                        <span className="ml-auto text-[11px] tabular-nums text-slate-400">
+                        <span className="text-[11px] text-ink-4">{q.topic}</span>
+                        <span className="ml-auto text-[11px] tabular-nums text-ink-3">
                           score {q.selection_score.toFixed(2)}
                         </span>
                       </div>
                       {q.selection_reason && (
-                        <p className="mt-1.5 text-[11px] leading-relaxed text-slate-600">
+                        <p className="mt-1.5 text-[11px] leading-relaxed text-ink-5">
                           {q.selection_reason}
                         </p>
                       )}
@@ -295,9 +295,9 @@ export default function PaperBuilderPage() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between border-b border-white/[0.04] pb-2 last:border-0">
-      <span className="text-slate-500">{label}</span>
-      <span className="text-slate-300">{value}</span>
+    <div className="flex justify-between border-b border-rule-soft pb-2 last:border-0">
+      <span className="text-ink-4">{label}</span>
+      <span className="text-ink-2">{value}</span>
     </div>
   );
 }

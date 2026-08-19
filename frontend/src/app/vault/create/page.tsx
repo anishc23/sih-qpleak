@@ -88,7 +88,7 @@ export default function CreateQuestionPage() {
                 className="field resize-y font-mono text-[13px]"
                 placeholder="Explain how a Merkle tree enables efficient membership proofs."
               />
-              <p className="mt-1.5 text-[11px] text-slate-600">
+              <p className="mt-1.5 text-[11px] text-ink-5">
                 {form.content.length} characters. Encrypted before it reaches the database.
               </p>
             </div>
@@ -159,7 +159,7 @@ export default function CreateQuestionPage() {
 
             <div>
               <label htmlFor="objective" className="label mb-1.5 block">
-                Learning objective <span className="text-slate-700">(optional)</span>
+                Learning objective <span className="text-ink-6">(optional)</span>
               </label>
               <input
                 id="objective"
@@ -186,11 +186,11 @@ export default function CreateQuestionPage() {
                 <div className="space-y-2.5 text-xs">
                   <Row label="Question ID" value={<span className="font-mono text-accent">{result.question.question_uid}</span>} />
                   <Row label="SHA-256" value={<Hash value={result.question.content_hash} chars={20} />} />
-                  <Row label="Cipher" value={<span className="text-slate-300">{String(result.encryption.algorithm)}</span>} />
-                  <Row label="Ciphertext" value={<span className="text-slate-300">{String(result.encryption.ciphertext_bytes)} bytes</span>} />
-                  <Row label="Key storage" value={<span className="text-slate-400">wrapped, never bare</span>} />
-                  <Row label="Version" value={<span className="text-slate-300">v{result.question.version}</span>} />
-                  <Row label="Status" value={<span className="text-slate-300">{result.question.status}</span>} />
+                  <Row label="Cipher" value={<span className="text-ink-2">{String(result.encryption.algorithm)}</span>} />
+                  <Row label="Ciphertext" value={<span className="text-ink-2">{String(result.encryption.ciphertext_bytes)} bytes</span>} />
+                  <Row label="Key storage" value={<span className="text-ink-3">wrapped, never bare</span>} />
+                  <Row label="Version" value={<span className="text-ink-2">v{result.question.version}</span>} />
+                  <Row label="Status" value={<span className="text-ink-2">{result.question.status}</span>} />
                 </div>
               </Panel>
 
@@ -228,7 +228,7 @@ export default function CreateQuestionPage() {
             </>
           ) : (
             <Panel title="What happens on submit">
-              <ol className="space-y-3 text-[13px] text-slate-400">
+              <ol className="space-y-3 text-[13px] text-ink-3">
                 {[
                   ["Generate a fresh AES-256 key", "unique to this question, never reused"],
                   ["Encrypt with AES-256-GCM", "authenticated, so tampering is detectable"],
@@ -242,15 +242,15 @@ export default function CreateQuestionPage() {
                       {i + 1}
                     </span>
                     <div>
-                      <p className="text-slate-300">{title}</p>
-                      <p className="text-[11px] text-slate-600">{sub}</p>
+                      <p className="text-ink-2">{title}</p>
+                      <p className="text-[11px] text-ink-5">{sub}</p>
                     </div>
                   </li>
                 ))}
               </ol>
-              <div className="mt-4 flex gap-2.5 rounded-lg border border-white/[0.07] bg-base-850/50 px-3.5 py-2.5">
-                <KeyRound size={14} className="mt-0.5 shrink-0 text-slate-600" />
-                <p className="text-[11px] leading-relaxed text-slate-500">
+              <div className="mt-4 flex gap-2.5 rounded-sm border border-rule bg-sunk/50 px-3.5 py-2.5">
+                <KeyRound size={14} className="mt-0.5 shrink-0 text-ink-5" />
+                <p className="text-[11px] leading-relaxed text-ink-4">
                   There is no <code className="font-mono">content</code> column on the questions
                   table &mdash; only ciphertext. Plaintext cannot be written by mistake.
                 </p>
@@ -265,8 +265,8 @@ export default function CreateQuestionPage() {
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 border-b border-white/[0.04] pb-2 last:border-0">
-      <span className="shrink-0 text-slate-500">{label}</span>
+    <div className="flex items-baseline justify-between gap-4 border-b border-rule-soft pb-2 last:border-0">
+      <span className="shrink-0 text-ink-4">{label}</span>
       <span className="text-right">{value}</span>
     </div>
   );

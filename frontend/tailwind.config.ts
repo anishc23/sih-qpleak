@@ -1,56 +1,81 @@
 import type { Config } from "tailwindcss";
 
+/**
+ * SecureLock — the custody register.
+ *
+ * Every colour is named for an object in the physical chain of custody an
+ * examination paper already travels through: the ruled register sheet it is
+ * signed out of, the lac seal pressed on the packet, the verdigris on the
+ * countersign stamp, iron-gall ink. The ground is ledger paper -- greenish
+ * grey, the colour of a book that is written in, not one that is sent.
+ */
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        // Deep navy / charcoal base with cyan accents -- a security-console
-        // palette rather than a consumer-app one.
-        base: {
-          950: "#060910",
-          900: "#0a0f1a",
-          850: "#0e1524",
-          800: "#131c2e",
-          700: "#1c2740",
-          600: "#273451",
+        // Surfaces, lightest-held-highest.
+        register: "#E3E7DB", // page ground: the ruled ledger sheet
+        leaf: "#EDF0E5", // a slip laid on the register
+        sunk: "#D6DBCB", // recessed: table zebra, meters, wells
+        rule: {
+          DEFAULT: "#BEC4B0", // hairlines and column rules
+          soft: "#CCD2BF",
         },
+
+        // Iron-gall ink, stepped down. Every step clears 4.5:1 on `register`
+        // so there is no such thing as an illegible hint in this system.
+        ink: {
+          DEFAULT: "#171B16",
+          2: "#2E332C",
+          3: "#454B41",
+          4: "#545A4F",
+          5: "#5C6257",
+          6: "#5F6560",
+        },
+
+        // Sealing wax. Reserved for the sealed state and the one primary
+        // action per screen -- if it is red, something is shut.
+        lac: {
+          DEFAULT: "#8E3020",
+          soft: "#A84232",
+        },
+
+        // Legacy semantic names kept so status logic reads unchanged.
         accent: {
-          DEFAULT: "#22d3ee",
-          soft: "#67e8f9",
-          dim: "#0e7490",
+          DEFAULT: "#8E3020",
+          soft: "#A84232",
+          dim: "#6E2418",
         },
-        ok: "#34d399",
-        warn: "#fbbf24",
-        danger: "#f87171",
-        locked: "#a78bfa",
+        ok: "#2E5C4E", // verdigris: verified, released, confirmed on chain
+        warn: "#7D560F", // ochre: pending, under review
+        danger: "#9B1C1C", // failure and tamper -- bluer than lac, never confused
+        locked: "#8E3020", // sealed is lac, always
       },
       fontFamily: {
-        sans: ["Inter", "Segoe UI", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "Consolas", "monospace"],
+        // Eczar: drawn for scholarly publishing in India, Latin + Devanagari
+        // from one family. Reads as a printed examination cover.
+        display: ["var(--font-display)", "Georgia", "serif"],
+        // Archivo: a grotesque drawn for print forms. Holds at 12px in the
+        // dense tables that are most of this application.
+        sans: ["var(--font-body)", "system-ui", "sans-serif"],
+        // Spline Sans Mono: even colour across 64 characters, so a SHA-256
+        // reads as a woven band rather than noise. 0/O and 1/l stay apart.
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       boxShadow: {
-        glow: "0 0 0 1px rgba(34,211,238,0.18), 0 8px 32px -8px rgba(34,211,238,0.22)",
-        panel: "0 1px 0 0 rgba(255,255,255,0.04) inset, 0 12px 32px -16px rgba(0,0,0,0.8)",
+        // Deboss, not glow. Paper is pressed, it does not emit light.
+        deboss: "inset 0 1px 0 0 rgba(255,255,255,0.7), 0 1px 0 0 rgba(25,29,24,0.06)",
+        seal: "0 2px 0 0 rgba(25,29,24,0.18)",
       },
       keyframes: {
-        "pulse-ring": {
-          "0%": { transform: "scale(0.95)", opacity: "0.7" },
-          "70%": { transform: "scale(1.15)", opacity: "0" },
-          "100%": { transform: "scale(0.95)", opacity: "0" },
-        },
         "slide-up": {
-          from: { opacity: "0", transform: "translateY(8px)" },
+          from: { opacity: "0", transform: "translateY(6px)" },
           to: { opacity: "1", transform: "translateY(0)" },
-        },
-        shimmer: {
-          "100%": { transform: "translateX(100%)" },
         },
       },
       animation: {
-        "pulse-ring": "pulse-ring 2.4s cubic-bezier(0.4,0,0.6,1) infinite",
-        "slide-up": "slide-up 0.35s ease-out both",
-        shimmer: "shimmer 1.8s infinite",
+        "slide-up": "slide-up 0.3s ease-out both",
       },
     },
   },

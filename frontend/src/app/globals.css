@@ -4,93 +4,107 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
-    @apply bg-base-950 text-slate-200 antialiased;
-    background-image:
-      radial-gradient(60rem 40rem at 15% -10%, rgba(34, 211, 238, 0.07), transparent 60%),
-      radial-gradient(50rem 36rem at 90% 0%, rgba(167, 139, 250, 0.06), transparent 55%);
-    background-attachment: fixed;
+    @apply bg-register font-sans text-ink antialiased;
+  }
+
+  /* Keyboard focus is never invisible, and never a glow. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-lac ring-offset-2 ring-offset-register;
   }
 
   ::selection {
-    @apply bg-accent/30 text-white;
+    @apply bg-lac/15 text-ink;
   }
 
-  /* Scrollbars styled to match the console aesthetic rather than the OS. */
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-base-900;
+    @apply bg-sunk;
   }
   ::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-base-700;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-base-600;
+    @apply bg-rule;
+    border: 3px solid #d6dbcb;
+    border-radius: 99px;
   }
 }
 
 @layer components {
+  /* ---------------------------------------------------------------- surfaces
+     Three values, so that something can read as more important than something
+     else -- the flaw in the previous single-surface system. */
+
+  /* A slip laid on the register. The workaday container. */
   .panel {
-    @apply rounded-xl border border-white/[0.07] bg-base-900/70 shadow-panel backdrop-blur-sm;
+    @apply rounded-sm border border-rule bg-leaf shadow-deboss;
   }
 
   .panel-hover {
-    @apply transition-colors hover:border-accent/25 hover:bg-base-850/80;
+    @apply transition-colors hover:border-ink-6;
   }
 
+  /* Recessed: wells, meters, zebra rows. */
+  .sunken {
+    @apply rounded-sm bg-sunk;
+  }
+
+  /* THE SEAL. The only dark object in the system. Sealed means opaque, so
+     sealed is rendered as ink you cannot see into. Used once per screen. */
+  .seal {
+    @apply rounded-sm bg-ink text-register shadow-seal;
+  }
+
+  /* Ruled register rows: a logbook has columns, not cards. */
+  .ruled > * + * {
+    @apply border-t border-rule-soft;
+  }
+
+  /* ---------------------------------------------------------------- text */
+
   .hash {
-    @apply font-mono text-[11px] tracking-tight text-slate-500;
+    @apply font-mono text-[11px] tracking-tight text-ink-5;
   }
 
   .label {
-    @apply text-[11px] font-medium uppercase tracking-[0.14em] text-slate-500;
+    @apply font-mono text-[10px] uppercase tracking-[0.18em] text-ink-5;
   }
 
+  /* A column heading in the register. */
+  .colhead {
+    @apply border-b border-rule pb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-5;
+  }
+
+  /* ---------------------------------------------------------------- controls */
+
   .field {
-    @apply w-full rounded-lg border border-white/10 bg-base-950/70 px-3 py-2.5 text-sm
-           text-slate-100 placeholder:text-slate-600 outline-none transition
-           focus:border-accent/50 focus:ring-2 focus:ring-accent/15;
+    @apply w-full rounded-sm border border-rule bg-leaf px-3 py-2.5 text-sm
+           text-ink placeholder:text-ink-6 outline-none transition
+           focus:border-ink-4;
   }
 
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-4 py-2.5 text-sm
            font-medium transition disabled:cursor-not-allowed disabled:opacity-40;
   }
   .btn-primary {
-    @apply btn bg-accent text-base-950 hover:bg-accent-soft;
+    @apply btn bg-lac text-register hover:bg-lac-soft;
   }
   .btn-ghost {
-    @apply btn border border-white/10 text-slate-300 hover:border-accent/30 hover:text-white;
+    @apply btn border border-rule text-ink-2 hover:border-ink-4 hover:text-ink;
   }
   .btn-danger {
-    @apply btn border border-danger/30 text-danger hover:bg-danger/10;
+    @apply btn border border-danger/40 text-danger hover:bg-danger/[0.06];
   }
 }
 
-/* Skeleton shimmer used while panels load. */
+/* Loading placeholder. A quiet tint, not a travelling sheen. */
 .shimmer {
-  position: relative;
-  overflow: hidden;
-}
-.shimmer::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  transform: translateX(-100%);
-  background-image: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0,
-    rgba(255, 255, 255, 0.04) 40%,
-    rgba(255, 255, 255, 0.07) 60%,
-    rgba(255, 255, 255, 0)
-  );
-  animation: shimmer 1.8s infinite;
+  @apply bg-sunk;
 }
 
 @media (prefers-reduced-motion: reduce) {

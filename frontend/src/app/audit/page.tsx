@@ -88,7 +88,7 @@ export default function AuditPage() {
                 {verification.broken_count === 1 ? "" : "s"}, first at{" "}
                 <span className="font-mono">{verification.first_broken_at}</span>.
               </p>
-              <p className="mt-2 text-slate-400">
+              <p className="mt-2 text-ink-3">
                 The database row was modified after it was written. The blockchain anchor is
                 unchanged and was never reachable from the database.
               </p>
@@ -114,17 +114,17 @@ export default function AuditPage() {
               )}
             </div>
             {tamperResult && (
-              <div className="mt-3.5 space-y-1.5 rounded-lg border border-danger/25 bg-danger/[0.05] px-3.5 py-3 text-xs">
-                <p className="text-slate-400">
+              <div className="mt-3.5 space-y-1.5 rounded-sm border border-danger/25 bg-danger/[0.05] px-3.5 py-3 text-xs">
+                <p className="text-ink-3">
                   Database now reads:{" "}
                   <span className="font-mono text-danger">{String(tamperResult.new_value)}</span>
                 </p>
-                <p className="text-slate-400">
+                <p className="text-ink-3">
                   Originally:{" "}
-                  <span className="font-mono text-slate-300">{String(tamperResult.original_value)}</span>
+                  <span className="font-mono text-ink-2">{String(tamperResult.original_value)}</span>
                 </p>
                 <p className="pt-1 font-semibold text-danger">{String(tamperResult.verdict)}</p>
-                <p className="leading-relaxed text-slate-500">{String(tamperResult.explanation)}</p>
+                <p className="leading-relaxed text-ink-4">{String(tamperResult.explanation)}</p>
               </div>
             )}
           </Panel>
@@ -139,10 +139,10 @@ export default function AuditPage() {
               <button
                 key={f.value}
                 onClick={() => setResourceType(f.value)}
-                className={`rounded-lg border px-2.5 py-1 text-[11px] transition ${
+                className={`rounded-sm border px-2.5 py-1 text-[11px] transition ${
                   resourceType === f.value
                     ? "border-accent/40 bg-accent/10 text-accent"
-                    : "border-white/10 text-slate-500 hover:text-slate-300"
+                    : "border-rule text-ink-4 hover:text-ink-2"
                 }`}
               >
                 {f.label}
@@ -150,10 +150,10 @@ export default function AuditPage() {
             ))}
             <button
               onClick={() => setOnlyFailures((v) => !v)}
-              className={`rounded-lg border px-2.5 py-1 text-[11px] transition ${
+              className={`rounded-sm border px-2.5 py-1 text-[11px] transition ${
                 onlyFailures
                   ? "border-danger/40 bg-danger/10 text-danger"
-                  : "border-white/10 text-slate-500 hover:text-slate-300"
+                  : "border-rule text-ink-4 hover:text-ink-2"
               }`}
             >
               Denials only
@@ -166,17 +166,17 @@ export default function AuditPage() {
         ) : events.length === 0 ? (
           <Empty message="No events match." />
         ) : (
-          <ol className="relative space-y-0 border-l border-white/[0.07] pl-5">
+          <ol className="space-y-0">
             {events.map((e) => (
-              <li key={e.event_uid} className="relative py-2.5">
-                <span
-                  className={`absolute -left-[25px] top-4 h-2 w-2 rounded-full ring-4 ring-base-950 ${
-                    e.success ? "bg-ok" : "bg-danger"
-                  }`}
-                />
+              <li
+                key={e.event_uid}
+                className={`relative border-l-2 py-2.5 pl-5 ${
+                  e.success ? "border-rule" : "border-lac"
+                }`}
+              >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="text-sm text-slate-200">
+                    <p className="text-sm text-ink">
                       {e.event_type.replace(/_/g, " ").toLowerCase()}
                       {!e.success && (
                         <span className="ml-2 rounded bg-danger/12 px-1.5 py-0.5 text-[10px] font-semibold text-danger">
@@ -184,22 +184,22 @@ export default function AuditPage() {
                         </span>
                       )}
                     </p>
-                    <p className="mt-0.5 text-[11px] text-slate-500">
+                    <p className="mt-0.5 text-[11px] text-ink-4">
                       <span className="font-mono">{e.resource_id}</span>
                       {e.actor_role && <> &middot; {e.actor_role.replace(/_/g, " ").toLowerCase()}</>}
                       {e.actor_uid && <> &middot; <span className="font-mono">{e.actor_uid}</span></>}
                     </p>
                     {typeof e.detail?.reason === "string" && (
-                      <p className="mt-1 text-[11px] italic text-slate-600">{e.detail.reason}</p>
+                      <p className="mt-1 text-[11px] italic text-ink-5">{e.detail.reason}</p>
                     )}
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
                     {e.blockchain_tx && <Hash value={e.blockchain_tx} chars={10} />}
                     <span title="event hash" className="flex items-center gap-1">
-                      <Link2 size={10} className="text-slate-700" />
+                      <Link2 size={10} className="text-ink-6" />
                       <Hash value={e.event_hash} chars={8} />
                     </span>
-                    <span className="text-[10px] text-slate-600">
+                    <span className="text-[10px] text-ink-5">
                       {formatDateTime(e.created_at)}
                     </span>
                   </div>
@@ -208,7 +208,7 @@ export default function AuditPage() {
             ))}
           </ol>
         )}
-        <p className="mt-4 flex items-center gap-1.5 text-[11px] text-slate-600">
+        <p className="mt-4 flex items-center gap-1.5 text-[11px] text-ink-5">
           <ShieldCheck size={11} />
           {events?.length ?? 0} events shown. Each row&rsquo;s hash incorporates the hash of the row
           before it.

@@ -38,15 +38,30 @@ Everything below is implemented and verified by automated tests. Nothing is mock
 
 **Test totals: 37 contract tests + 44 backend tests + a 60-assertion end-to-end run, all passing.**
 
-A web frontend is **not yet built** — see [Status](#status). The API is fully
-usable today through its OpenAPI UI at `/docs`.
+The web app is built and is the way to see all of this — sixteen routes, live
+against the chain. The API is also usable directly through its OpenAPI UI at
+`/docs`.
 
 ---
 
 ## Quick start
 
-Prerequisites: **Node 18+**, **Python 3.11+**. No Docker, no database server, no
-internet, no API keys.
+Prerequisites: **Node 18+**, **Python 3.11–3.13**. No Docker, no database
+server, no internet, no API keys.
+
+> Python 3.14 does not work. The pinned `pydantic-core` builds through PyO3,
+> which refuses anything newer than 3.13, and pip fails deep inside a Rust
+> build. `scripts/start.sh` checks this before it does anything else.
+
+**macOS / Linux**
+
+```bash
+git clone https://github.com/anishc23/sih-qpleak.git
+cd sih-qpleak
+./scripts/start.sh
+```
+
+**Windows**
 
 ```powershell
 git clone https://github.com/anishc23/sih-qpleak.git
@@ -54,8 +69,9 @@ cd sih-qpleak
 .\scripts\start.ps1
 ```
 
-That script installs dependencies, starts a local Hardhat chain, deploys both
-contracts, seeds 37 encrypted questions and six demo accounts, and starts the API.
+Either script installs dependencies, starts a local Hardhat chain, deploys both
+contracts, seeds 37 encrypted questions and seven demo accounts, and starts the
+API and the web app. `scripts/stop.sh` stops everything again.
 
 Then prove the whole thing works:
 
@@ -84,6 +100,18 @@ uvicorn app.main:app --reload
 python scripts/e2e_demo.py
 ```
 </details>
+
+### Resetting the demo
+
+Use `scripts/reset_demo.sh`. Do not reset the database on its own.
+
+Identifiers like `PAPER-2026-001` and `Q-000001` are regenerated from the start
+by `seed --reset`, but the chain still holds the previous run's records under
+those same identifiers, and the contracts then refuse everything that follows —
+`QuestionAlreadyRegistered`, `InvalidLifecycleTransition`, and most visibly
+`PaperAlreadyRegistered`, after which no new paper can ever be sealed. The
+contracts are right to refuse; the mistake is resetting one half of the system.
+Reset both together, or neither.
 
 ### Demo accounts
 
@@ -213,7 +241,11 @@ sih-qpleak/
 │   ├── test/             37 contract tests
 │   └── scripts/deploy.js writes addresses + ABIs for the backend to pick up
 ├── scripts/
-│   ├── start.ps1         one-command stack startup
+│   ├── start.sh          one-command startup (macOS / Linux)
+│   ├── start.ps1         one-command startup (Windows)
+│   ├── stop.sh           stop everything start.sh began
+│   ├── reset_demo.sh     reset chain AND database together -- read this before
+│   │                     you reset either one on its own
 │   └── e2e_demo.py       full demo flow, asserted
 └── docs/
     └── PROJECT_BRIEF.md  the original problem statement and design brief
@@ -231,6 +263,10 @@ Two settings worth knowing:
 
 - `ENCRYPTION_MASTER_KEY` — base64 of 32 bytes. Wraps every per-question and
   per-paper data key. In production this belongs in a KMS or HSM, not a file.
+- `NEXT_PUBLIC_RPC_URL` and `NEXT_PUBLIC_PAPER_CONTRACT` — the landing page
+  reads the chain directly from the browser rather than through the API, so the
+  live seal works before anyone signs in. Both have working defaults for the
+  local demo; set them if you move the chain or deploy elsewhere.
 - `BLOCKCHAIN_RPC_URL` — defaults to the local Hardhat node. Point it at any
   EVM-compatible testnet with `BLOCKCHAIN_PRIVATE_KEY` set. No public testnet is
   hardcoded, deliberately: testnets get deprecated and demos should not depend
@@ -261,7 +297,9 @@ audit trail, blockchain explorer, security dashboard.
 > If port 3000 is already taken on your machine, start it elsewhere:
 > `cd frontend && npx next start -p 3100`.
 
-**Not yet built:** `docs/SIH_PITCH.md` and `docs/JUDGE_QA.md`.
+**Documentation:** `docs/SecureLock_Explained.pdf` explains the whole system
+from scratch for a non-technical reader; `docs/SecureLock_User_Manual.pdf` is
+the operator's guide to running and demonstrating the prototype.
 
 ---
 

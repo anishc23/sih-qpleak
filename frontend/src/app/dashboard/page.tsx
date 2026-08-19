@@ -17,7 +17,7 @@ import Shell from "@/components/Shell";
 import { Alert, Hash, PageHeader, Panel, Skeleton, Stat } from "@/components/ui";
 import { api, type AuditEvent, type DashboardStats, type Paper } from "@/lib/api";
 import { ROLE_LABEL, useAuth } from "@/lib/auth";
-import { relativeTime } from "@/lib/format";
+import { formatDateTime, relativeTime } from "@/lib/format";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -74,6 +74,45 @@ export default function DashboardPage() {
         <Skeleton rows={4} />
       ) : (
         <>
+          {locked.length > 0 ? (
+            <section className="seal mb-6 p-6 lg:p-7">
+              <div className="flex items-baseline justify-between gap-4">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-register/60">
+                  Under seal
+                </span>
+                <Link
+                  href="/timelock"
+                  className="font-mono text-[10px] uppercase tracking-[0.18em] text-register/60 underline-offset-4 hover:text-register hover:underline"
+                >
+                  Try to open it
+                </Link>
+              </div>
+              <div className="mt-6 space-y-6">
+                {locked.map((p) => (
+                  <Link key={p.paper_uid} href={`/timelock?paper=${p.paper_uid}`} className="block">
+                    <p className="font-display text-3xl leading-none text-register">{p.paper_uid}</p>
+                    <p className="mt-2 text-[13px] text-register/70">{p.exam_title}</p>
+                    <p className="mt-1 break-all font-mono text-[11px] text-register/50">
+                      {p.paper_hash}
+                    </p>
+                    {p.release_time && (
+                      <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-register/70">
+                        Opens {formatDateTime(p.release_time)}
+                      </p>
+                    )}
+                  </Link>
+                ))}
+              </div>
+              <p className="mt-6 font-mono text-[11px] text-register/60">
+                Release is decided by the contract. This page cannot open it.
+              </p>
+            </section>
+          ) : (
+            <p className="mb-6 border-t border-rule pt-4 font-mono text-[11px] uppercase tracking-[0.18em] text-ink-5">
+              Nothing is under seal right now
+            </p>
+          )}
+
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Stat label="Questions" value={stats.total_questions} icon={Vault} hint="all encrypted at rest" />
             <Stat label="In pool" value={stats.approved_questions} tone="ok" icon={CheckCircle2} hint="approved for synthesis" />
@@ -91,42 +130,7 @@ export default function DashboardPage() {
             <Stat label="Audit events" value={stats.audit_events} icon={Activity} hint="hash chained" />
           </div>
 
-          <div className="mt-5 grid gap-5 lg:grid-cols-2">
-            <Panel
-              title="Papers under time lock"
-              subtitle="Release is decided by the smart contract, never by this page"
-              action={
-                <Link href="/timelock" className="text-xs text-accent hover:underline">
-                  Open demo
-                </Link>
-              }
-            >
-              {locked.length === 0 ? (
-                <p className="py-6 text-center text-sm text-slate-600">
-                  No papers are currently locked.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {locked.map((p) => (
-                    <Link
-                      key={p.paper_uid}
-                      href={`/timelock?paper=${p.paper_uid}`}
-                      className="flex items-center justify-between rounded-lg border border-locked/20 bg-locked/[0.05] px-3.5 py-3 transition hover:border-locked/40"
-                    >
-                      <div className="min-w-0">
-                        <p className="flex items-center gap-2 text-sm text-slate-200">
-                          <Lock size={13} className="text-locked" />
-                          {p.paper_uid}
-                        </p>
-                        <p className="mt-0.5 truncate text-[11px] text-slate-500">{p.exam_title}</p>
-                      </div>
-                      <Hash value={p.paper_hash} chars={12} />
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </Panel>
-
+          <div className="mt-5">
             <Panel
               title="Recent activity"
               subtitle="Every entry is hash-chained to its predecessor"
@@ -137,7 +141,7 @@ export default function DashboardPage() {
               }
             >
               {events.length === 0 ? (
-                <p className="py-6 text-center text-sm text-slate-600">No activity yet.</p>
+                <p className="py-6 text-center text-sm text-ink-5">No activity yet.</p>
               ) : (
                 <ul className="space-y-1.5">
                   {events.map((e) => (
@@ -145,11 +149,11 @@ export default function DashboardPage() {
                       <span
                         className={`h-1.5 w-1.5 shrink-0 rounded-full ${e.success ? "bg-ok" : "bg-danger"}`}
                       />
-                      <span className="min-w-0 flex-1 truncate text-xs text-slate-300">
+                      <span className="min-w-0 flex-1 truncate text-xs text-ink-2">
                         {e.event_type.replace(/_/g, " ").toLowerCase()}
-                        <span className="ml-1.5 text-slate-600">{e.resource_id}</span>
+                        <span className="ml-1.5 text-ink-5">{e.resource_id}</span>
                       </span>
-                      <span className="shrink-0 text-[10px] text-slate-600">
+                      <span className="shrink-0 text-[10px] text-ink-5">
                         {relativeTime(e.created_at)}
                       </span>
                     </li>
@@ -162,7 +166,7 @@ export default function DashboardPage() {
           <div className="mt-5">
             <Panel title="Papers" subtitle="Lifecycle status across all examinations">
               {papers.length === 0 ? (
-                <p className="py-6 text-center text-sm text-slate-600">
+                <p className="py-6 text-center text-sm text-ink-5">
                   No papers generated yet.
                 </p>
               ) : (
@@ -171,18 +175,18 @@ export default function DashboardPage() {
                     <Link
                       key={p.paper_uid}
                       href={`/papers/${p.paper_uid}`}
-                      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/[0.06] px-3.5 py-3 transition hover:border-accent/25"
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-rule-soft px-3.5 py-3 transition hover:border-accent/25"
                     >
                       <div className="min-w-0">
-                        <p className="flex items-center gap-2 text-sm text-slate-200">
-                          <FileStack size={13} className="text-slate-600" />
+                        <p className="flex items-center gap-2 text-sm text-ink">
+                          <FileStack size={13} className="text-ink-5" />
                           {p.paper_uid}
                         </p>
-                        <p className="mt-0.5 truncate text-[11px] text-slate-500">
+                        <p className="mt-0.5 truncate text-[11px] text-ink-4">
                           {p.exam_title} &middot; {p.question_count} questions
                         </p>
                       </div>
-                      <span className="text-[11px] text-slate-500">{p.status.replace(/_/g, " ")}</span>
+                      <span className="text-[11px] text-ink-4">{p.status.replace(/_/g, " ")}</span>
                     </Link>
                   ))}
                 </div>
